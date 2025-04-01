@@ -6,8 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
+
     @Id
     private String email;
 
@@ -15,6 +16,11 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles = new HashSet<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Student student;
+
+    // --- Getters and Setters ---
 
     public String getEmail() {
         return email;
@@ -38,5 +44,13 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
