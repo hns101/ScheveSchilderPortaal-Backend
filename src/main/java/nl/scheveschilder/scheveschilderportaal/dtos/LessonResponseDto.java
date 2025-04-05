@@ -4,6 +4,7 @@ import nl.scheveschilder.scheveschilderportaal.models.Lesson;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class LessonResponseDto {
     public Long id;
@@ -25,6 +26,7 @@ public class LessonResponseDto {
                     s.firstname = student.getFirstname();
                     s.lastname = student.getLastname();
                     s.defaultSlot = student.getDefaultSlot();
+                    s.email = student.getUser() != null ? student.getUser().getEmail() : null;
                     return s;
                 }).toList();
         return dto;

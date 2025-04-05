@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserStudentService {
@@ -62,5 +63,41 @@ public class UserStudentService {
         return userRepo.findAll().stream()
                 .map(UserStudentDto::fromEntity)
                 .toList();
+    }
+
+    public UserStudentDto getUserByEmail(String email) {
+        return userRepo.findById(email)
+                .map(UserStudentDto::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("Gebruiker met email '" + email + "' niet gevonden."));
+    }
+
+    public void deleteUser(String email) {
+        User user = userRepo.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("Gebruiker met email '" + email + "' niet gevonden."));
+        userRepo.delete(user);
+    }
+
+    public UserStudentDto updateUser(String email, UserStudentDto input) {
+        User user = userRepo.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("Gebruiker met email '" + email + "' niet gevonden."));
+
+        if (input.roles != null && !input.roles.isEmpty()) {
+            Set<Role> roles = input.roles.stream()
+                    .map(roleName -> roleRepo.findById(roleName)
+                            .orElseThrow(() -> new IllegalArgumentException("Rol '" + roleName + "' niet gevonden.")))
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
+        if (user.getStudent() != null && input.student != null) {
+            Student s = user.getStudent();
+            s.setFirstname(input.student.firstname);
+            s.setLastname(input.student.lastname);
+            s.setDefaultSlot(input.student.defaultSlot);
+            studentRepo.save(s);
+        }
+
+        userRepo.save(user);
+        return UserStudentDto.fromEntity(user);
     }
 }

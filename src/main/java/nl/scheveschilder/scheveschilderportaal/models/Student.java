@@ -19,8 +19,8 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     private Set<Lesson> lessons = new HashSet<>();
 
-    @OneToOne
-    @JoinColumn(name = "user_email", unique = true) // 🔒 enforce uniqueness
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_email", unique = true)
     private User user;
 
     // --- Getters and Setters ---

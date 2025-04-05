@@ -29,5 +29,21 @@ public class UserStudentController {
     public ResponseEntity<List<UserStudentDto>> getAllUsers() {
         return ResponseEntity.ok(userStudentService.getAllUsersWithStudents());
     }
-}
 
+    @GetMapping("/admin/users/{email}")
+    public ResponseEntity<UserStudentDto> getUser(@PathVariable String email) {
+        return ResponseEntity.ok(userStudentService.getUserByEmail(email));
+    }
+
+    @PutMapping("/admin/users/{email}")
+    public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserStudentDto input) {
+        UserStudentDto updated = userStudentService.updateUser(email, input);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/admin/users/{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+        userStudentService.deleteUser(email);
+        return ResponseEntity.noContent().build();
+    }
+}

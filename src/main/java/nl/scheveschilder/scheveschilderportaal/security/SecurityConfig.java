@@ -1,5 +1,6 @@
 package nl.scheveschilder.scheveschilderportaal.security;
 
+import nl.scheveschilder.scheveschilderportaal.config.CustomCorsConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import nl.scheveschilder.scheveschilderportaal.repositories.UserRepository;
@@ -19,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 
 import java.util.List;
 
@@ -55,54 +56,37 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(CorsConfigurer::disable) // ✅ Disable CORS security to test, or configure properly below
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ allow CORS preflight requests early
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+
+                        // ✅ all public endpoints first
                         .requestMatchers("/test").permitAll()
                         .requestMatchers(HttpMethod.POST, "/weeks").permitAll()
                         .requestMatchers(HttpMethod.GET, "/weeks").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/weeks/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/students").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/register/admin/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/register/admin/users/{email}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/register/admin/users/{email}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/register/admin/users/{email}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-                        .requestMatchers( "/auth/login").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
 
+                        // ✅ this must be LAST
                         .anyRequest().denyAll()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtRequestFilter(jwtService, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http.addFilterBefore(new JwtRequestFilter(jwtService, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() { // ✅ CORS Configuration
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:5174")); // ✅ Allow frontend
-//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-//        configuration.setAllowCredentials(true); // ✅ Allow cookies & authorization headers
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return (CorsConfigurationSource) source;
-//    }
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(auth -> auth
-//                                .requestMatchers("/test").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-////                                .requestMatchers("/test").hasRole("ADMIN")
-////                    .requestMatchers("/hello").authenticated()
-////                    .requestMatchers("/profiles", "/profiles/*").authenticated()
-//                                .anyRequest().denyAll()
-//                )
-//                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .csrf(csrf -> csrf.disable())
-//                .addFilterBefore(new JwtRequestFilter(jwtService, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
-//
-//        return http.build();
-//    }
+
 }
