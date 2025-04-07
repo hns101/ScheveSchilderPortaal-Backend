@@ -51,25 +51,25 @@ INSERT INTO users_roles(roles_rolename, users_email) VALUES
                                                          ('ROLE_USER',  'fleur@example.com');
 
 -- === STUDENTS ===
-INSERT INTO student(id, firstname, lastname, default_slot, active_member, user_email) VALUES
-                                                                                          ('1', 'Nico',    'Heijnen',  'Vrijdag Avond',    true, 'nico@example.com'),
-                                                                                          ('2', 'Mirjam',  'Koopmans', 'Woensdag Avond',   true, 'mirjam@example.com'),
-                                                                                          ('3', 'Eva',     'Janssen',  'Zaterdag Ochtend', true, 'eva@example.com'),
-                                                                                          ('4', 'Jim',     'Bakmans',  'Vrijdag Avond',    true, 'jim@example.com'),
-                                                                                          ('5', 'Kristal', 'Kaars',    'Woensdag Avond',   true, 'kristal@example.com'),
-                                                                                          ('6', 'Jop',     'Popper',   'Zaterdag Ochtend', true, 'jop@example.com'),
-                                                                                          ('7', 'Mark',    'De Vries', 'Vrijdag Avond',    true, 'mark@example.com'),
-                                                                                          ('8', 'Lisa',    'Bakker',   'Woensdag Avond',   true, 'lisa@example.com'),
-                                                                                          ('9', 'Tom',     'Mulder',   'Woensdag Avond',   true, 'tom@example.com'),
-                                                                                          ('10','Anna',    'Vermeer',  'Zaterdag Ochtend', true, 'anna@example.com'),
-                                                                                          ('11','Bas',     'Hermans',  'Vrijdag Avond',    true, 'bas@example.com'),
-                                                                                          ('12','Sophie',  'Meijer',   'Woensdag Avond',   true, 'sophie@example.com'),
-                                                                                          ('13','Ruben',   'Dekker',   'Woensdag Avond',   true, 'ruben@example.com'),
-                                                                                          ('14','Naomi',   'Vos',      'Vrijdag Avond',    true, 'naomi@example.com'),
-                                                                                          ('15','Daan',    'Kuiper',   'Woensdag Avond',   true, 'daan@example.com'),
-                                                                                          ('16','Lars',    'Koning',   'Zaterdag Ochtend', true, 'lars@example.com'),
-                                                                                          ('17','Emma',    'Blom',     'Woensdag Avond',   true, 'emma@example.com'),
-                                                                                          ('18','Fleur',   'Peeters',  'Woensdag Avond',   true, 'fleur@example.com');
+INSERT INTO student(firstname, lastname, default_slot, active_member, user_email) VALUES
+                                                                                      ('Nico',    'Heijnen',  'Vrijdag Avond',    true, 'nico@example.com'),
+                                                                                      ('Mirjam',  'Koopmans', 'Woensdag Avond',   true, 'mirjam@example.com'),
+                                                                                      ('Eva',     'Janssen',  'Zaterdag Ochtend', true, 'eva@example.com'),
+                                                                                      ('Jim',     'Bakmans',  'Vrijdag Avond',    true, 'jim@example.com'),
+                                                                                      ('Kristal', 'Kaars',    'Woensdag Avond',   true, 'kristal@example.com'),
+                                                                                      ('Jop',     'Popper',   'Zaterdag Ochtend', true, 'jop@example.com'),
+                                                                                      ('Mark',    'De Vries', 'Vrijdag Avond',    true, 'mark@example.com'),
+                                                                                      ('Lisa',    'Bakker',   'Woensdag Avond',   true, 'lisa@example.com'),
+                                                                                      ('Tom',     'Mulder',   'Woensdag Avond',   true, 'tom@example.com'),
+                                                                                      ('Anna',    'Vermeer',  'Zaterdag Ochtend', true, 'anna@example.com'),
+                                                                                      ('Bas',     'Hermans',  'Vrijdag Avond',    true, 'bas@example.com'),
+                                                                                      ('Sophie',  'Meijer',   'Woensdag Avond',   true, 'sophie@example.com'),
+                                                                                      ('Ruben',   'Dekker',   'Woensdag Avond',   true, 'ruben@example.com'),
+                                                                                      ('Naomi',   'Vos',      'Vrijdag Avond',    true, 'naomi@example.com'),
+                                                                                      ('Daan',    'Kuiper',   'Woensdag Avond',   true, 'daan@example.com'),
+                                                                                      ('Lars',    'Koning',   'Zaterdag Ochtend', true, 'lars@example.com'),
+                                                                                      ('Emma',    'Blom',     'Woensdag Avond',   true, 'emma@example.com'),
+                                                                                      ('Fleur',   'Peeters',  'Woensdag Avond',   true, 'fleur@example.com');
 
 -- === WEEKS (auto-generated IDs) ===
 INSERT INTO week(week_num, start_date) VALUES

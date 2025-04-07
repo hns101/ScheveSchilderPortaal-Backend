@@ -142,7 +142,7 @@ public class WeekService {
         }
 
         Set<Student> newStudents = studentIds.stream()
-                .map(id -> studentRepo.findById(id)
+                .map(id -> studentRepo.findById(Long.valueOf(id))
                         .orElseThrow(() -> new IllegalArgumentException("Student met ID " + id + " niet gevonden.")))
                 .collect(Collectors.toSet());
 

@@ -8,6 +8,8 @@ import nl.scheveschilder.scheveschilderportaal.models.User;
 import nl.scheveschilder.scheveschilderportaal.repositories.RoleRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.StudentRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,17 +22,23 @@ public class UserStudentService {
     private final StudentRepository studentRepo;
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserStudentService(StudentRepository studentRepo, UserRepository userRepo, RoleRepository roleRepo) {
+
+    public UserStudentService(
+            StudentRepository studentRepo,
+            UserRepository userRepo,
+            RoleRepository roleRepo,
+            PasswordEncoder passwordEncoder  // ✅ Add this
+    ) {
         this.studentRepo = studentRepo;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
+        this.passwordEncoder = passwordEncoder;  // ✅ Save it
     }
 
     public StudentDto createUserAndStudent(StudentDto dto) {
-        if (studentRepo.existsById(dto.id)) {
-            throw new IllegalArgumentException("Student ID '" + dto.id + "' bestaat al.");
-        }
+        // Don't check studentRepo.existsById(dto.id); we want to generate it
 
         User user = userRepo.findById(dto.email).orElseGet(() -> {
             User newUser = new User();
@@ -47,7 +55,6 @@ public class UserStudentService {
         }
 
         Student student = new Student();
-        student.setId(dto.id);
         student.setFirstname(dto.firstname);
         student.setLastname(dto.lastname);
         student.setDefaultSlot(dto.defaultSlot);
@@ -74,6 +81,17 @@ public class UserStudentService {
     public void deleteUser(String email) {
         User user = userRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("Gebruiker met email '" + email + "' niet gevonden."));
+
+        if (user.getStudent() != null) {
+            Student student = user.getStudent();
+
+            // Remove student from all lessons first
+            student.getLessons().forEach(lesson -> lesson.getStudents().remove(student));
+            studentRepo.save(student); // update DB to reflect changes
+
+            studentRepo.delete(student); // now safe to delete
+        }
+
         userRepo.delete(user);
     }
 
@@ -99,5 +117,13 @@ public class UserStudentService {
 
         userRepo.save(user);
         return UserStudentDto.fromEntity(user);
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
     }
 }

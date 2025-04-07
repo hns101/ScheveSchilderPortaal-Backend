@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/register")
@@ -44,6 +45,13 @@ public class UserStudentController {
     @DeleteMapping("/admin/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {
         userStudentService.deleteUser(email);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/admin/users/{email}/password")
+    public ResponseEntity<?> updatePassword(@PathVariable String email, @RequestBody Map<String, String> body) {
+        String newPassword = body.get("newPassword");
+        userStudentService.updatePassword(email, newPassword);
         return ResponseEntity.noContent().build();
     }
 }
