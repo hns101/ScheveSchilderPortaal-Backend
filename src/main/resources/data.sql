@@ -14,7 +14,6 @@ INSERT INTO users(email, password) VALUES
                                        ('jop@example.com',   '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),
                                        ('eva@example.com',   '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),
                                        ('mark@example.com',  '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),
-                                       -- New users
                                        ('lisa@example.com',  '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),
                                        ('tom@example.com',   '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),
                                        ('anna@example.com',  '$2a$10$N74RktuepMLWkReIrJf/L.vNNm.ILXq9DMMlpzn889lga1yNaPNBW'),

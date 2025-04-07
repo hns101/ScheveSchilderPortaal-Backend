@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/weeks").permitAll()
                         .requestMatchers(HttpMethod.GET, "/weeks").permitAll()
                         .requestMatchers(HttpMethod.GET, "/weeks/{id}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/weeks/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").permitAll()
