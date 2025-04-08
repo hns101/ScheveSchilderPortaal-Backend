@@ -1,6 +1,7 @@
 package nl.scheveschilder.scheveschilderportaal.controllers;
 
 import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
 import nl.scheveschilder.scheveschilderportaal.service.UserStudentService;
 import org.springframework.http.HttpStatus;
@@ -37,10 +38,11 @@ public class UserStudentController {
     }
 
     @PutMapping("/admin/users/{email}")
-    public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserStudentDto input) {
-        UserStudentDto updated = userStudentService.updateUser(email, input);
+    public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserDto dto) {
+        UserStudentDto updated = userStudentService.updateUser(email, dto);
         return ResponseEntity.ok(updated);
     }
+
 
     @DeleteMapping("/admin/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {

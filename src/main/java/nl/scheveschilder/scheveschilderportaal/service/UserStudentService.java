@@ -1,6 +1,7 @@
 package nl.scheveschilder.scheveschilderportaal.service;
 
 import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
 import nl.scheveschilder.scheveschilderportaal.models.Role;
 import nl.scheveschilder.scheveschilderportaal.models.Student;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,22 +26,19 @@ public class UserStudentService {
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
 
-
     public UserStudentService(
             StudentRepository studentRepo,
             UserRepository userRepo,
             RoleRepository roleRepo,
-            PasswordEncoder passwordEncoder  // ✅ Add this
+            PasswordEncoder passwordEncoder
     ) {
         this.studentRepo = studentRepo;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
-        this.passwordEncoder = passwordEncoder;  // ✅ Save it
+        this.passwordEncoder = passwordEncoder;
     }
 
     public StudentDto createUserAndStudent(StudentDto dto) {
-        // Don't check studentRepo.existsById(dto.id); we want to generate it
-
         User user = userRepo.findById(dto.email).orElseGet(() -> {
             User newUser = new User();
             newUser.setEmail(dto.email);
@@ -85,22 +84,23 @@ public class UserStudentService {
         if (user.getStudent() != null) {
             Student student = user.getStudent();
 
-            // Remove student from all lessons first
             student.getLessons().forEach(lesson -> lesson.getStudents().remove(student));
-            studentRepo.save(student); // update DB to reflect changes
+            studentRepo.save(student);
 
-            studentRepo.delete(student); // now safe to delete
+            studentRepo.delete(student);
         }
 
         userRepo.delete(user);
     }
 
-    public UserStudentDto updateUser(String email, UserStudentDto input) {
+    public UserStudentDto updateUser(String email, UserDto input) {
         User user = userRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("Gebruiker met email '" + email + "' niet gevonden."));
 
-        if (input.roles != null && !input.roles.isEmpty()) {
-            Set<Role> roles = input.roles.stream()
+        // Skip updating email — it's immutable here
+
+        if (input.roles != null && input.roles.length > 0) {
+            Set<Role> roles = Arrays.stream(input.roles)
                     .map(roleName -> roleRepo.findById(roleName)
                             .orElseThrow(() -> new IllegalArgumentException("Rol '" + roleName + "' niet gevonden.")))
                     .collect(Collectors.toSet());
