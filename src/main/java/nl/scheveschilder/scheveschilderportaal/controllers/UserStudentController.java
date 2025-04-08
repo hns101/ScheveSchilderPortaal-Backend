@@ -1,6 +1,7 @@
 package nl.scheveschilder.scheveschilderportaal.controllers;
 
 import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
 import nl.scheveschilder.scheveschilderportaal.service.UserStudentService;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/register")
@@ -36,14 +38,22 @@ public class UserStudentController {
     }
 
     @PutMapping("/admin/users/{email}")
-    public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserStudentDto input) {
-        UserStudentDto updated = userStudentService.updateUser(email, input);
+    public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserDto dto) {
+        UserStudentDto updated = userStudentService.updateUser(email, dto);
         return ResponseEntity.ok(updated);
     }
+
 
     @DeleteMapping("/admin/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {
         userStudentService.deleteUser(email);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/admin/users/{email}/password")
+    public ResponseEntity<?> updatePassword(@PathVariable String email, @RequestBody Map<String, String> body) {
+        String newPassword = body.get("newPassword");
+        userStudentService.updatePassword(email, newPassword);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,7 +1,7 @@
 package nl.scheveschilder.scheveschilderportaal.dtos;
 
 public class StudentDto {
-    public String id;
+    public Long id;
     public String firstname;
     public String lastname;
     public String defaultSlot;

@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/register/admin/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/register/admin/users/{email}").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/register/admin/users/{email}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/register/admin/users/{email}/password").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/register/admin/users/{email}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()

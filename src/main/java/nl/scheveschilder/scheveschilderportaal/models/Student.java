@@ -7,8 +7,10 @@ import java.util.Set;
 
 @Entity
 public class Student {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // or AUTO or SEQUENCE depending on your DB
+    private Long id;
 
     private String firstname;
     private String lastname;
@@ -65,11 +67,11 @@ public class Student {
         this.firstname = firstname;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
