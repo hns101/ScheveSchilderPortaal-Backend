@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/register")
 public class UserStudentController {
 
     private final UserStudentService userStudentService;
@@ -21,36 +20,36 @@ public class UserStudentController {
         this.userStudentService = userStudentService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<StudentDto> register(@RequestBody StudentDto dto) {
         StudentDto created = userStudentService.createUserAndStudent(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @GetMapping("/admin/users")
+    @GetMapping("/users")
     public ResponseEntity<List<UserStudentDto>> getAllUsers() {
         return ResponseEntity.ok(userStudentService.getAllUsersWithStudents());
     }
 
-    @GetMapping("/admin/users/{email}")
+    @GetMapping("/users/{email}")
     public ResponseEntity<UserStudentDto> getUser(@PathVariable String email) {
         return ResponseEntity.ok(userStudentService.getUserByEmail(email));
     }
 
-    @PutMapping("/admin/users/{email}")
+    @PutMapping("/users/{email}")
     public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserDto dto) {
         UserStudentDto updated = userStudentService.updateUser(email, dto);
         return ResponseEntity.ok(updated);
     }
 
 
-    @DeleteMapping("/admin/users/{email}")
+    @DeleteMapping("/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {
         userStudentService.deleteUser(email);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/admin/users/{email}/password")
+    @PutMapping("/users/{email}/password")
     public ResponseEntity<?> updatePassword(@PathVariable String email, @RequestBody Map<String, String> body) {
         String newPassword = body.get("newPassword");
         userStudentService.updatePassword(email, newPassword);
