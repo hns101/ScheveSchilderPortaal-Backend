@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/register")
 public class UserStudentController {
 
     private final UserStudentService userStudentService;
@@ -21,18 +20,18 @@ public class UserStudentController {
         this.userStudentService = userStudentService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<StudentDto> register(@RequestBody StudentDto dto) {
         StudentDto created = userStudentService.createUserAndStudent(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @GetMapping("/admin/users")
+    @GetMapping("/users")
     public ResponseEntity<List<UserStudentDto>> getAllUsers() {
         return ResponseEntity.ok(userStudentService.getAllUsersWithStudents());
     }
 
-    @GetMapping("/admin/users/{email}")
+    @GetMapping("/users/{email}")
     public ResponseEntity<UserStudentDto> getUser(@PathVariable String email) {
         return ResponseEntity.ok(userStudentService.getUserByEmail(email));
     }
