@@ -4,6 +4,7 @@ import nl.scheveschilder.scheveschilderportaal.dtos.LessonDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.WeekDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.WeekResponseDto;
 import nl.scheveschilder.scheveschilderportaal.models.Week;
+import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.WeekService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,11 @@ import java.util.List;
 public class WeekController {
 
     private final WeekService weekService;
+    private final SecurityUtil securityUtil;
 
-    public WeekController(WeekService weekService) {
+    public WeekController(WeekService weekService, SecurityUtil securityUtil) {
         this.weekService = weekService;
+        this.securityUtil = securityUtil;
     }
 
     @PostMapping
@@ -76,6 +79,11 @@ public class WeekController {
             @PathVariable Long weekId,
             @PathVariable Long lessonId,
             @PathVariable String email) {
+
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(weekService.addStudentByEmail(weekId, lessonId, email));
     }
 
@@ -84,6 +92,11 @@ public class WeekController {
             @PathVariable Long weekId,
             @PathVariable Long lessonId,
             @PathVariable String email) {
+
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(weekService.removeStudentByEmail(weekId, lessonId, email));
     }
 }

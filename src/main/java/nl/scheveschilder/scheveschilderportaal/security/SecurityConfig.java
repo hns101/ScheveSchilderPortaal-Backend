@@ -74,7 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/users/{email}/password").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/{email}").hasAnyRole( "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/students").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers("/auth/login").permitAll()
 
