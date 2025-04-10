@@ -36,20 +36,20 @@ public class UserStudentController {
         return ResponseEntity.ok(userStudentService.getUserByEmail(email));
     }
 
-    @PutMapping("/admin/users/{email}")
+    @PutMapping("/users/{email}")
     public ResponseEntity<UserStudentDto> updateUser(@PathVariable String email, @RequestBody UserDto dto) {
         UserStudentDto updated = userStudentService.updateUser(email, dto);
         return ResponseEntity.ok(updated);
     }
 
 
-    @DeleteMapping("/admin/users/{email}")
+    @DeleteMapping("/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {
         userStudentService.deleteUser(email);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/admin/users/{email}/password")
+    @PutMapping("/users/{email}/password")
     public ResponseEntity<?> updatePassword(@PathVariable String email, @RequestBody Map<String, String> body) {
         String newPassword = body.get("newPassword");
         userStudentService.updatePassword(email, newPassword);
