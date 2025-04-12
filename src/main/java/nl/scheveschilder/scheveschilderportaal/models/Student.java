@@ -25,6 +25,9 @@ public class Student {
     @JoinColumn(name = "user_email", unique = true)
     private User user;
 
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Gallery gallery;
+
     // --- Getters and Setters ---
 
     public Set<Lesson> getLessons() {
