@@ -21,23 +21,17 @@ public class GalleryService {
         this.studentRepo = studentRepo;
     }
 
-    public GalleryDto getGalleryByStudent(Long studentId) {
-        Gallery gallery = galleryRepo.findByStudentId(studentId)
-                .orElseThrow(() -> new IllegalArgumentException("Gallery not found"));
+    public GalleryDto getGalleryByStudentEmail(String email) {
+        Student student = studentRepo.findAll().stream()
+                .filter(s -> s.getUser() != null && s.getUser().getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Student niet gevonden"));
 
-        GalleryDto dto = new GalleryDto();
-        dto.id = gallery.getId();
-        dto.studentId = gallery.getStudent().getId();
-        dto.artworks = gallery.getArtworks().stream().map(a -> {
-            ArtworkDto adto = new ArtworkDto();
-            adto.id = a.getId();
-            adto.title = a.getTitle();
-            adto.year = a.getYear();
-            adto.photoUrl = a.getPhotoUrl();
-            adto.artistId = studentId;
-            return adto;
-        }).collect(Collectors.toList());
+        Gallery gallery = galleryRepo.findByStudent(student)
+                .orElseThrow(() -> new IllegalArgumentException("Gallery niet gevonden"));
 
-        return dto;
+        return GalleryDto.fromEntity(gallery);
     }
+
+
 }
