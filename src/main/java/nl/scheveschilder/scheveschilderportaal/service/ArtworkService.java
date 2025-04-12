@@ -4,7 +4,6 @@ import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
 import nl.scheveschilder.scheveschilderportaal.models.Artwork;
 import nl.scheveschilder.scheveschilderportaal.models.Gallery;
 import nl.scheveschilder.scheveschilderportaal.models.Student;
-import nl.scheveschilder.scheveschilderportaal.models.User;
 import nl.scheveschilder.scheveschilderportaal.repositories.ArtworkRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.StudentRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.GalleryRepository;
@@ -85,6 +84,19 @@ public class ArtworkService {
         }
 
         artworkRepo.delete(artwork);
+    }
+
+    public void assignPhotoToArtwork(Long artworkId, String photoFileName) {
+        Artwork artwork = artworkRepo.findById(artworkId)
+                .orElseThrow(() -> new IllegalArgumentException("Artwork niet gevonden"));
+        artwork.setPhotoUrl(photoFileName);
+        artworkRepo.save(artwork);
+    }
+
+    public String getArtworkPhotoFileName(Long artworkId) {
+        return artworkRepo.findById(artworkId)
+                .map(Artwork::getPhotoUrl)
+                .orElseThrow(() -> new IllegalArgumentException("Foto niet gevonden"));
     }
 
 
