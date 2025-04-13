@@ -17,6 +17,7 @@ import java.util.Objects;
 
 @Service
 public class ArtworkPhotoService {
+
     private final Path fileStoragePath;
 
     public ArtworkPhotoService(@Value("${my.upload_location}") String uploadDir) throws IOException {
@@ -38,5 +39,14 @@ public class ArtworkPhotoService {
             throw new RuntimeException("Foto niet gevonden of onleesbaar.");
         }
         return resource;
+    }
+
+    public void deletePhoto(String filename) {
+        try {
+            Path path = this.fileStoragePath.resolve(filename); // ✅ FIXED
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Kon bestand niet verwijderen: " + filename, e);
+        }
     }
 }

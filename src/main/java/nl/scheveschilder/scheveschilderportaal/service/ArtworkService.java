@@ -18,11 +18,13 @@ public class ArtworkService {
     private final ArtworkRepository artworkRepo;
     private final StudentRepository studentRepo;
     private final GalleryRepository galleryRepo;
+    private final ArtworkPhotoService artworkPhotoService;
 
-    public ArtworkService(ArtworkRepository artworkRepo, StudentRepository studentRepo, GalleryRepository galleryRepo) {
+    public ArtworkService(ArtworkRepository artworkRepo, StudentRepository studentRepo, GalleryRepository galleryRepo, ArtworkPhotoService artworkPhotoService  ) {
         this.artworkRepo = artworkRepo;
         this.studentRepo = studentRepo;
         this.galleryRepo = galleryRepo;
+        this.artworkPhotoService = artworkPhotoService;
     }
 
     public List<ArtworkDto> getArtworksByStudentEmail(String email) {
@@ -68,19 +70,12 @@ public class ArtworkService {
     }
 
     public void removeArtwork(String email, Long artworkId) {
-        // Find the student by email
-        Student student = studentRepo.findAll().stream()
-                .filter(s -> s.getUser() != null && s.getUser().getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Student met email '" + email + "' niet gevonden."));
-
-        // Find the artwork
         Artwork artwork = artworkRepo.findById(artworkId)
-                .orElseThrow(() -> new IllegalArgumentException("Kunstwerk met ID '" + artworkId + "' niet gevonden."));
+                .orElseThrow(() -> new IllegalArgumentException("Artwork not found"));
 
-        // Check that the artwork belongs to this student
-        if (!artwork.getArtist().equals(student)) {
-            throw new IllegalArgumentException("Student is niet de eigenaar van dit kunstwerk.");
+        String photoFile = artwork.getPhotoUrl();
+        if (photoFile != null && !photoFile.isEmpty()) {
+            artworkPhotoService.deletePhoto(photoFile);
         }
 
         artworkRepo.delete(artwork);
@@ -98,7 +93,5 @@ public class ArtworkService {
                 .map(Artwork::getPhotoUrl)
                 .orElseThrow(() -> new IllegalArgumentException("Foto niet gevonden"));
     }
-
-
 }
 

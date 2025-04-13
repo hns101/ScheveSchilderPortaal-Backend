@@ -122,13 +122,11 @@ INSERT INTO gallery(student_id) VALUES
 
 -- === ARTWORKS ===
 INSERT INTO artwork(title, year, photo_url, gallery_id, student_id) VALUES
-                                                                        ('Zonsondergang', '2023', '/images/artworks/zonsondergang.jpg', 1, 1),
-                                                                        ('Zelfportret', '2024', '/images/artworks/zelfportret.jpg', 1, 1),
-                                                                        ('Bloemenveld', '2022', '/images/artworks/bloemenveld.jpg', 2, 2),
-                                                                        ('Stadsgezicht', '2023', '/images/artworks/stadsgezicht.jpg', 3, 3),
-                                                                        ('Abstract Licht', '2024', '/images/artworks/abstractlicht.jpg', 4, 4),
-                                                                        ('Berglandschap', '2021', '/images/artworks/berglandschap.jpg', 5, 5),
-                                                                        ('Droomwereld', '2023', '/images/artworks/droomwereld.jpg', 6, 6),
-                                                                        ('De Nacht', '2022', '/images/artworks/denacht.jpg', 7, 7),
-                                                                        ('Lentegevoel', '2024', '/images/artworks/lentegevoel.jpg', 8, 8),
-                                                                        ('Familie', '2023', '/images/artworks/familie.jpg', 9, 9);
+                                                                        ('Zonsondergang', '2023', 'Zonsondergang.png', 2, 2),
+                                                                        ('Zelfportret', '2024', 'Zelfportret.png', 2, 2),
+                                                                        ('Bloemenveld', '2022', 'Bloemenveld.png', 2, 2),
+                                                                        ('Abstract Licht', '2024', 'Abstract Licht.png', 2, 2),
+                                                                        ('Berglandschap', '2021', 'Berglandschap.png', 2, 2),
+                                                                        ('Droomwereld', '2023', 'Droomwereld.png', 2, 2),
+                                                                        ('Lentegevoel', '2024', 'Lentegevoel.png', 2, 2),
+                                                                        ('Familie', '2023', 'Familie.png', 2, 2);
