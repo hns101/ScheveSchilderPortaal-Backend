@@ -114,3 +114,19 @@ INSERT INTO lesson_students(lesson_id, student_id) VALUES
                                                        (7, '2'), (7, '5'), (7, '8'), (7, '9'), (7, '12'), (7, '13'), (7, '15'), (7, '17'), (7, '18'),
                                                        (8, '1'), (8, '4'), (8, '7'), (8, '11'), (8, '14'),
                                                        (9, '3'), (9, '6'), (9, '10'), (9, '16');
+
+-- === GALLERIES ===
+INSERT INTO gallery(student_id) VALUES
+                                    (1), (2), (3), (4), (5),
+                                    (6), (7), (8), (9), (10);
+
+-- === ARTWORKS ===
+INSERT INTO artwork(title, year, photo_url, gallery_id, student_id) VALUES
+                                                                        ('Zonsondergang', '2023', 'Zonsondergang.png', 2, 2),
+                                                                        ('Zelfportret', '2024', 'Zelfportret.png', 2, 2),
+                                                                        ('Bloemenveld', '2022', 'Bloemenveld.png', 2, 2),
+                                                                        ('Abstract Licht', '2024', 'Abstract Licht.png', 2, 2),
+                                                                        ('Berglandschap', '2021', 'Berglandschap.png', 2, 2),
+                                                                        ('Droomwereld', '2023', 'Droomwereld.png', 2, 2),
+                                                                        ('Lentegevoel', '2024', 'Lentegevoel.png', 2, 2),
+                                                                        ('Familie', '2023', 'Familie.png', 2, 2);

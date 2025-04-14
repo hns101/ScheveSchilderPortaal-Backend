@@ -75,6 +75,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/users/{email}").hasAnyRole( "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/students").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/galleries/{email}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/galleries/{email}/artworks").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/galleries/{email}/artworks").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/galleries/{email}/artworks/{artworkId}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers("/auth/login").permitAll()
 
