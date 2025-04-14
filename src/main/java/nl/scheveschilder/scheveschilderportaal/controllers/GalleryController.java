@@ -2,6 +2,7 @@ package nl.scheveschilder.scheveschilderportaal.controllers;
 
 import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryDto;
+import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkPhotoService;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkService;
 import nl.scheveschilder.scheveschilderportaal.service.GalleryService;
@@ -24,31 +25,49 @@ public class GalleryController {
     private final GalleryService galleryService;
     private final ArtworkService artworkService;
     private final ArtworkPhotoService artworkPhotoService;
+    private final SecurityUtil securityUtil;
 
-    public GalleryController(GalleryService galleryService, ArtworkService artworkService, ArtworkPhotoService artworkPhotoService) {
+    public GalleryController(
+            GalleryService galleryService,
+            ArtworkService artworkService,
+            ArtworkPhotoService artworkPhotoService,
+            SecurityUtil securityUtil
+    ) {
         this.galleryService = galleryService;
         this.artworkService = artworkService;
         this.artworkPhotoService = artworkPhotoService;
+        this.securityUtil = securityUtil;
     }
 
     @GetMapping("/galleries/{email}")
     public ResponseEntity<GalleryDto> getGallery(@PathVariable String email) {
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(galleryService.getGalleryByStudentEmail(email));
     }
 
-
     @GetMapping("/galleries/{email}/artworks")
     public ResponseEntity<List<ArtworkDto>> getAllArtworks(@PathVariable String email) {
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(artworkService.getArtworksByStudentEmail(email));
     }
 
     @PostMapping("/galleries/{email}/artworks")
     public ResponseEntity<ArtworkDto> addArtwork(@PathVariable String email, @RequestBody ArtworkDto dto) {
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(artworkService.addArtworkToStudent(email, dto));
     }
 
     @DeleteMapping("/galleries/{email}/artworks/{artworkId}")
     public ResponseEntity<Void> deleteArtwork(@PathVariable String email, @PathVariable Long artworkId) {
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         artworkService.removeArtwork(email, artworkId);
         return ResponseEntity.noContent().build();
     }
@@ -56,7 +75,7 @@ public class GalleryController {
     @PostMapping("/artworks/{id}/photo")
     public ResponseEntity<Void> uploadArtworkPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         String fileName = artworkPhotoService.storePhoto(file);
-        artworkService.assignPhotoToArtwork(id, fileName); // Implement this method
+        artworkService.assignPhotoToArtwork(id, fileName);
         return ResponseEntity.ok().build();
     }
 
@@ -80,5 +99,5 @@ public class GalleryController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
-
 }
+
