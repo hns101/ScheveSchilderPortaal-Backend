@@ -1,5 +1,6 @@
 package nl.scheveschilder.scheveschilderportaal.service;
 
+import nl.scheveschilder.scheveschilderportaal.dtos.RegisterStudentDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
@@ -37,21 +38,20 @@ public class UserStudentService {
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
     }
-
-    public StudentDto createUserAndStudent(StudentDto dto) {
-        User user = userRepo.findById(dto.email).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setEmail(dto.email);
-            newUser.setPassword("changeme");
-            Role roleUser = roleRepo.findById("ROLE_USER")
-                    .orElseThrow(() -> new IllegalStateException("Rol 'ROLE_USER' niet gevonden."));
-            newUser.setRoles(Set.of(roleUser));
-            return userRepo.save(newUser);
-        });
-
-        if (user.getStudent() != null) {
-            throw new IllegalStateException("Deze gebruiker is al gekoppeld aan een andere student.");
+    public StudentDto registerUserAndStudent(RegisterStudentDto dto) {
+        if (dto.password == null || dto.password.length() < 6) {
+            throw new IllegalArgumentException("Wachtwoord moet minimaal 6 tekens lang zijn.");
         }
+
+        User user = new User();
+        user.setEmail(dto.email);
+        user.setPassword(passwordEncoder.encode(dto.password));
+
+        Role roleUser = roleRepo.findById("ROLE_USER")
+                .orElseThrow(() -> new IllegalStateException("Rol 'ROLE_USER' niet gevonden."));
+        user.setRoles(Set.of(roleUser));
+
+        userRepo.save(user);
 
         Student student = new Student();
         student.setFirstname(dto.firstname);
@@ -62,8 +62,17 @@ public class UserStudentService {
 
         studentRepo.save(student);
 
-        return dto;
+        // Convert to StudentDto
+        StudentDto result = new StudentDto();
+        result.id = student.getId();
+        result.firstname = student.getFirstname();
+        result.lastname = student.getLastname();
+        result.defaultSlot = student.getDefaultSlot();
+        result.email = user.getEmail();
+
+        return result;
     }
+
 
     public List<UserStudentDto> getAllUsersWithStudents() {
         return userRepo.findAll().stream()
