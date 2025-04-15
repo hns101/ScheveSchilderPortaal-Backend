@@ -1,5 +1,6 @@
 package nl.scheveschilder.scheveschilderportaal.controllers;
 
+import nl.scheveschilder.scheveschilderportaal.dtos.RegisterStudentDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
@@ -25,8 +26,8 @@ public class UserStudentController {
 
     // Unprotected for admin creation
     @PostMapping("/register")
-    public ResponseEntity<StudentDto> register(@RequestBody StudentDto dto) {
-        StudentDto created = userStudentService.createUserAndStudent(dto);
+    public ResponseEntity<StudentDto> registerStudent(@RequestBody RegisterStudentDto dto) {
+        StudentDto created = userStudentService.registerUserAndStudent(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
