@@ -1,8 +1,5 @@
 package nl.scheveschilder.scheveschilderportaal.security;
 
-import nl.scheveschilder.scheveschilderportaal.config.CustomCorsConfigurer;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import nl.scheveschilder.scheveschilderportaal.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,17 +9,13 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.web.cors.CorsUtils;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -53,14 +46,19 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return new MyUserDetailsService(this.userRepository);
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ allow CORS preflight requests early
+                        // ✅ Group all public endpoints together at the top
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        // ✅ all public endpoints first
+                        .requestMatchers(HttpMethod.POST, "/auth").permitAll() // Your original rule
+                        .requestMatchers("/auth/login").permitAll() // Your original rule
+                        .requestMatchers("/api/auth/**").permitAll() // NEW rule for password reset
+
+                        // Role-based security for other endpoints
                         .requestMatchers(HttpMethod.POST, "/weeks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks/{id}").hasAnyRole("USER", "ADMIN")
@@ -82,10 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-
-                        // ✅ this must be LAST
+                        // ✅ This must be LAST to secure all other endpoints
                         .anyRequest().denyAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -94,6 +89,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }
