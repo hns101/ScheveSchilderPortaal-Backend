@@ -31,7 +31,7 @@ public class EmailService {
     public void sendPasswordResetEmail(String to, String token) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@scheveschilderportaal.nl"); // Or your 'from' address
+            message.setFrom("noreply@scheveschilder.nl"); // Or your 'from' address
             message.setTo(to);
             message.setSubject("Reset Your Password");
 
