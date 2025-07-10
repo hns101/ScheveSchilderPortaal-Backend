@@ -33,13 +33,18 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@scheveschilder.nl"); // Or your 'from' address
             message.setTo(to);
-            message.setSubject("Reset Your Password");
+            message.setSubject("Wachtwoord opnieuw instellen voor De Scheve Schilder 🎨");
 
             // The URL should point to your React application's password reset page
-            String resetUrl = "http://localhost:5173/reset-password?token=" + token; // Adjust the URL as needed
+            String resetUrl = "http://localhost:5174/reset-password/" + token; // Pas de URL aan indien nodig
 
-            String emailText = "To reset your password, click the link below:\n" + resetUrl
-                    + "\n\nIf you did not request a password reset, please ignore this email.";
+            // De creatieve Nederlandse e-mailtekst
+            String emailText = "Hé kunstenaar! 👨‍🎨\n\n"
+                    + "Ben je je wachtwoord vergeten? Geen paniek! Klik op de link hieronder om een nieuw wachtwoord te maken:\n\n"
+                    + resetUrl + "\n\n"
+                    + "Heb jij hier niet om gevraagd? Beschouw deze e-mail dan als een mislukt kunstwerk en negeer hem gerust. Je account is veilig!\n\n"
+                    + "Met een kleurrijke groet,\n"
+                    + "De Scheve Schilder 🖌️";
 
             message.setText(emailText);
             mailSender.send(message);

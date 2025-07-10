@@ -27,7 +27,7 @@ public class PasswordResetController {
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody PasswordResetRequestDto resetRequest) {
         passwordResetService.handleForgotPassword(resetRequest.getEmail());
         // Always return a generic success message for security reasons.
-        String message = "If an account with that email exists, a password reset link has been sent.";
+        String message = "Als er een account met dat e-mailadres bestaat, is er een link verzonden om uw wachtwoord opnieuw in te stellen.";
         return ResponseEntity.ok(message);
     }
 
@@ -37,6 +37,6 @@ public class PasswordResetController {
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody PasswordResetDto passwordResetDto) {
         passwordResetService.handleResetPassword(passwordResetDto.getToken(), passwordResetDto.getNewPassword());
-        return ResponseEntity.ok("Your password has been successfully updated.");
+        return ResponseEntity.ok("Uw wachtwoord is succesvol bijgewerkt.");
     }
 }
