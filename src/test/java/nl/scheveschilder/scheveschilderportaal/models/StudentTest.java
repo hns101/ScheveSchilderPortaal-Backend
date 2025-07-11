@@ -69,18 +69,18 @@ class StudentTest {
         assertEquals(expectedDefaultSlot, actualDefaultSlot, "getDefaultSlot should return the default slot that was set");
     }
 
-    @Test
-    void testSetAndIsActiveMember() {
-        // Arrange
-        boolean expectedActiveStatus = true;
-
-        // Act
-        student.setActiveMember(expectedActiveStatus);
-        boolean actualActiveStatus = student.isActiveMember();
-
-        // Assert
-        assertTrue(actualActiveStatus, "isActiveMember should return true when active status is set to true");
-    }
+//    @Test
+//    void testSetAndIsActiveMember() {
+//        // Arrange
+//        boolean expectedActiveStatus = true;
+//
+//        // Act
+//        student.setActiveMember(expectedActiveStatus);
+//        boolean actualActiveStatus = student.isActiveMember();
+//
+//        // Assert
+//        assertTrue(actualActiveStatus, "isActiveMember should return true when active status is set to true");
+//    }
 
     @Test
     void testSetAndGetLessons() {

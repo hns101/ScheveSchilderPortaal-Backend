@@ -6,4 +6,5 @@ public class StudentDto {
     public String lastname;
     public String defaultSlot;
     public String email; // Linked to User.email
+    public boolean active; // --- NEW FIELD ---
 }

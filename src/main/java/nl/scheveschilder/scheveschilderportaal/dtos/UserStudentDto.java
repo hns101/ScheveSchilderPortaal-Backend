@@ -27,6 +27,7 @@ public class UserStudentDto {
             sdto.lastname = s.getLastname();
             sdto.defaultSlot = s.getDefaultSlot();
             sdto.email = user.getEmail(); // from linked user
+            sdto.active = s.isActive(); // --- ADD THIS LINE ---
             dto.student = sdto;
         }
 

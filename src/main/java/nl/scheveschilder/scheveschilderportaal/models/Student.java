@@ -9,14 +9,16 @@ import java.util.Set;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // or AUTO or SEQUENCE depending on your DB
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstname;
     private String lastname;
     private String defaultSlot;
 
-    private boolean activeMember;
+    // Renamed for clarity and added a default value for new students
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
     @ManyToMany(mappedBy = "students")
     private Set<Lesson> lessons = new HashSet<>();
@@ -38,12 +40,13 @@ public class Student {
         this.lessons = lessons;
     }
 
-    public boolean isActiveMember() {
-        return activeMember;
+    // Updated getter and setter for the 'active' field
+    public boolean isActive() {
+        return active;
     }
 
-    public void setActiveMember(boolean activeMember) {
-        this.activeMember = activeMember;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public String getDefaultSlot() {

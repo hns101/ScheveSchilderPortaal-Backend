@@ -1,9 +1,6 @@
 package nl.scheveschilder.scheveschilderportaal.controllers;
 
-import nl.scheveschilder.scheveschilderportaal.dtos.RegisterStudentDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.StudentDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.UserDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.UserStudentDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.*;
 import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.UserStudentService;
 import org.springframework.http.HttpStatus;
@@ -69,6 +66,14 @@ public class UserStudentController {
         }
         String newPassword = body.get("newPassword");
         userStudentService.updatePassword(email, newPassword);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- NEW ENDPOINT ---
+    @PutMapping("/users/{email}/status")
+    public ResponseEntity<Void> updateUserStatus(@PathVariable String email, @RequestBody UserStatusDto statusDto) {
+        // Security for this should be handled in SecurityConfig to ensure only Admins can access.
+        userStudentService.updateUserStatus(email, statusDto.getActive());
         return ResponseEntity.noContent().build();
     }
 }
