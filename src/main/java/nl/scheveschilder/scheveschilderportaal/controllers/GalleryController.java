@@ -1,20 +1,22 @@
 package nl.scheveschilder.scheveschilderportaal.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.GalleryStatusDto;
 import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkPhotoService;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkService;
 import nl.scheveschilder.scheveschilderportaal.service.GalleryService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -45,6 +47,18 @@ public class GalleryController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return ResponseEntity.ok(galleryService.getGalleryByStudentEmail(email));
+    }
+
+    // --- NEW ENDPOINT ---
+    @PutMapping("/galleries/{email}/status")
+    public ResponseEntity<Void> updateGalleryStatus(@PathVariable String email, @Valid @RequestBody GalleryStatusDto statusDto) {
+        // Security check: only the user themselves can change their gallery status.
+        // Admins are also allowed by this check, which is fine for now.
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        galleryService.updateGalleryStatus(email, statusDto.getIsPublic());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/galleries/{email}/artworks")
@@ -100,4 +114,3 @@ public class GalleryController {
                 .body(resource);
     }
 }
-
