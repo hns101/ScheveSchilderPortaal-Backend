@@ -45,18 +45,33 @@ public class GalleryService {
         galleryRepo.save(gallery);
     }
 
-    // --- NEW METHOD ---
-    /**
-     * Fetches all galleries that are marked as public.
-     * @return A list of GalleryDto objects for all public galleries.
-     */
     public List<GalleryDto> getPublicGalleries() {
-        // Use the new repository method to find all galleries where isPublic is true
         List<Gallery> publicGalleries = galleryRepo.findAllByIsPublic(true);
 
-        // Convert the list of Gallery entities to a list of GalleryDto objects
         return publicGalleries.stream()
                 .map(GalleryDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    // --- NEW METHOD ---
+    /**
+     * Fetches a single gallery by student ID, but only if it's public.
+     * @param studentId The ID of the student whose gallery is being requested.
+     * @return A GalleryDto if the gallery is found and is public.
+     * @throws ResourceNotFoundException if the gallery doesn't exist or is private.
+     */
+    public GalleryDto getPublicGalleryByStudentId(Long studentId) {
+        Student student = studentRepo.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
+
+        Gallery gallery = galleryRepo.findByStudent(student)
+                .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
+        // Security check: only return the gallery if it's public
+        if (!gallery.isPublic()) {
+            throw new ResourceNotFoundException("Gallery is not public.");
+        }
+
+        return GalleryDto.fromEntity(gallery);
     }
 }

@@ -41,14 +41,21 @@ public class GalleryController {
         this.securityUtil = securityUtil;
     }
 
-    // --- NEW PUBLIC ENDPOINT ---
+    // --- PUBLIC ENDPOINTS ---
     @GetMapping("/public/galleries")
     public ResponseEntity<List<GalleryDto>> getPublicGalleries() {
         List<GalleryDto> publicGalleries = galleryService.getPublicGalleries();
         return ResponseEntity.ok(publicGalleries);
     }
 
+    @GetMapping("/public/gallery/{studentId}")
+    public ResponseEntity<GalleryDto> getPublicGalleryById(@PathVariable Long studentId) {
+        GalleryDto gallery = galleryService.getPublicGalleryByStudentId(studentId);
+        return ResponseEntity.ok(gallery);
+    }
 
+
+    // --- PROTECTED ENDPOINTS ---
     @GetMapping("/galleries/{email}")
     public ResponseEntity<GalleryDto> getGallery(@PathVariable String email) {
         if (!securityUtil.isSelfOrAdmin(email)) {

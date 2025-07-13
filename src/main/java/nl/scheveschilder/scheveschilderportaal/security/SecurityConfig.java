@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/public/galleries").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/public/gallery/**").permitAll()
 
                         // Role-based security for other endpoints
                         .requestMatchers(HttpMethod.POST, "/weeks").hasRole("ADMIN")
