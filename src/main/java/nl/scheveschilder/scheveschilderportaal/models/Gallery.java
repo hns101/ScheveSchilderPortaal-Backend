@@ -12,11 +12,9 @@ public class Gallery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- NEW FIELD ---
-    // This will track if the gallery is visible to the public.
-    // It defaults to 'false' for all new galleries.
-    @Column(name = "is_public", nullable = false, columnDefinition = "boolean default false")
-    private boolean isPublic = false;
+    // --- UPDATED: Default value is now 'true' ---
+    @Column(name = "is_public", nullable = false, columnDefinition = "boolean default true")
+    private boolean isPublic = true;
 
     @OneToOne
     @JoinColumn(name = "student_id", unique = true)
@@ -35,7 +33,6 @@ public class Gallery {
         this.id = id;
     }
 
-    // --- New Getter and Setter for isPublic ---
     public boolean isPublic() {
         return isPublic;
     }

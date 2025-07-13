@@ -50,7 +50,6 @@ INSERT INTO users_roles(roles_rolename, users_email) VALUES
                                                          ('ROLE_USER',  'fleur@example.com');
 
 -- === STUDENTS ===
--- The column 'active_member' has been renamed to 'is_active' to match the Student entity.
 INSERT INTO student(firstname, lastname, default_slot, is_active, user_email) VALUES
                                                                                   ('Nico',    'Klaasen',  'Vrijdag Avond',    true, 'nico@example.com'),
                                                                                   ('John',  'Doe', 'Woensdag Avond',   true, 'john@example.com'),
@@ -71,54 +70,41 @@ INSERT INTO student(firstname, lastname, default_slot, is_active, user_email) VA
                                                                                   ('Emma',    'Blom',     'Woensdag Avond',   true, 'emma@example.com'),
                                                                                   ('Fleur',   'Peeters',  'Woensdag Avond',   true, 'fleur@example.com');
 
--- === WEEKS (auto-generated IDs) ===
+-- === WEEKS ===
 INSERT INTO week(week_num, start_date) VALUES
                                            (1, '2025-02-03'),
                                            (2, '2025-02-10'),
                                            (3, '2025-02-17');
 
--- === LESSONS (auto-generated IDs, must run after weeks are inserted) ===
--- Week 1
+-- === LESSONS ===
 INSERT INTO lesson(slot, time, date, week_id) VALUES
                                                   ('Woensdag Avond', '19:00 - 21:30', '2025-02-05', 1),
                                                   ('Vrijdag Avond',  '19:00 - 21:30', '2025-02-07', 1),
-                                                  ('Zaterdag Ochtend', '09:00 - 11:30', '2025-02-08', 1);
-
--- Week 2
-INSERT INTO lesson(slot, time, date, week_id) VALUES
+                                                  ('Zaterdag Ochtend', '09:00 - 11:30', '2025-02-08', 1),
                                                   ('Woensdag Avond', '19:00 - 21:30', '2025-02-12', 2),
                                                   ('Vrijdag Avond',  '19:00 - 21:30', '2025-02-14', 2),
-                                                  ('Zaterdag Ochtend', '09:00 - 11:30', '2025-02-15', 2);
-
--- Week 3
-INSERT INTO lesson(slot, time, date, week_id) VALUES
+                                                  ('Zaterdag Ochtend', '09:00 - 11:30', '2025-02-15', 2),
                                                   ('Woensdag Avond', '19:00 - 21:30', '2025-02-19', 3),
                                                   ('Vrijdag Avond',  '19:00 - 21:30', '2025-02-21', 3),
                                                   ('Zaterdag Ochtend', '09:00 - 11:30', '2025-02-22', 3);
 
 -- === LESSON-STUDENT LINKS ===
--- Week 1 lessons (IDs 1–3 assumed)
 INSERT INTO lesson_students(lesson_id, student_id) VALUES
-                                                       (1, '2'), (1, '5'), (1, '8'), (1, '9'), (1, '12'), (1, '13'), (1, '15'), (1, '17'), (1, '18'),
-                                                       (2, '1'), (2, '4'), (2, '7'), (2, '11'), (2, '14'),
-                                                       (3, '3'), (3, '6'), (3, '10'), (3, '16');
-
--- Week 2 lessons (IDs 4–6 assumed)
-INSERT INTO lesson_students(lesson_id, student_id) VALUES
-                                                       (4, '2'), (4, '5'), (4, '8'), (4, '9'), (4, '12'), (4, '13'), (4, '15'), (4, '17'), (4, '18'),
-                                                       (5, '1'), (5, '4'), (5, '7'), (5, '11'), (5, '14'),
-                                                       (6, '3'), (6, '6'), (6, '10'), (6, '16');
-
--- Week 3 lessons (IDs 7–9 assumed)
-INSERT INTO lesson_students(lesson_id, student_id) VALUES
-                                                       (7, '2'), (7, '5'), (7, '8'), (7, '9'), (7, '12'), (7, '13'), (7, '15'), (7, '17'), (7, '18'),
-                                                       (8, '1'), (8, '4'), (8, '7'), (8, '11'), (8, '14'),
-                                                       (9, '3'), (9, '6'), (9, '10'), (9, '16');
+                                                       (1, 2), (1, 5), (1, 8), (1, 9), (1, 12), (1, 13), (1, 15), (1, 17), (1, 18),
+                                                       (2, 1), (2, 4), (2, 7), (2, 11), (2, 14),
+                                                       (3, 3), (3, 6), (3, 10), (3, 16),
+                                                       (4, 2), (4, 5), (4, 8), (4, 9), (4, 12), (4, 13), (4, 15), (4, 17), (4, 18),
+                                                       (5, 1), (5, 4), (5, 7), (5, 11), (5, 14),
+                                                       (6, 3), (6, 6), (6, 10), (6, 16),
+                                                       (7, 2), (7, 5), (7, 8), (7, 9), (7, 12), (7, 13), (7, 15), (7, 17), (7, 18),
+                                                       (8, 1), (8, 4), (8, 7), (8, 11), (8, 14),
+                                                       (9, 3), (9, 6), (9, 10), (9, 16);
 
 -- === GALLERIES ===
-INSERT INTO gallery(student_id) VALUES
-                                    (1), (2), (3), (4), (5),
-                                    (6), (7), (8), (9), (10);
+-- Updated to include the is_public column, defaulting to true
+INSERT INTO gallery(student_id, is_public) VALUES
+                                               (1, true), (2, true), (3, true), (4, true), (5, true),
+                                               (6, true), (7, true), (8, true), (9, true), (10, true);
 
 -- === ARTWORKS ===
 INSERT INTO artwork(title, year, photo_url, gallery_id, student_id) VALUES
@@ -130,5 +116,3 @@ INSERT INTO artwork(title, year, photo_url, gallery_id, student_id) VALUES
                                                                         ('Droomwereld', '2023', 'Droomwereld.png', 2, 2),
                                                                         ('Lentegevoel', '2024', 'Lentegevoel.png', 2, 2),
                                                                         ('Familie', '2023', 'Familie.png', 2, 2);
-
-UPDATE student SET is_active = true;
