@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/public/galleries").permitAll()
 
                         // Role-based security for other endpoints
                         .requestMatchers(HttpMethod.POST, "/weeks").hasRole("ADMIN")
@@ -75,7 +76,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/students").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/galleries/{email}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/galleries/{email}/status").hasAnyRole("USER", "ADMIN") // --- NEW RULE ---
+                        .requestMatchers(HttpMethod.PUT, "/galleries/{email}/status").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/galleries/{email}/artworks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/galleries/{email}/artworks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/galleries/{email}/artworks/{artworkId}").hasAnyRole("USER", "ADMIN")

@@ -41,6 +41,14 @@ public class GalleryController {
         this.securityUtil = securityUtil;
     }
 
+    // --- NEW PUBLIC ENDPOINT ---
+    @GetMapping("/public/galleries")
+    public ResponseEntity<List<GalleryDto>> getPublicGalleries() {
+        List<GalleryDto> publicGalleries = galleryService.getPublicGalleries();
+        return ResponseEntity.ok(publicGalleries);
+    }
+
+
     @GetMapping("/galleries/{email}")
     public ResponseEntity<GalleryDto> getGallery(@PathVariable String email) {
         if (!securityUtil.isSelfOrAdmin(email)) {
@@ -49,11 +57,8 @@ public class GalleryController {
         return ResponseEntity.ok(galleryService.getGalleryByStudentEmail(email));
     }
 
-    // --- NEW ENDPOINT ---
     @PutMapping("/galleries/{email}/status")
     public ResponseEntity<Void> updateGalleryStatus(@PathVariable String email, @Valid @RequestBody GalleryStatusDto statusDto) {
-        // Security check: only the user themselves can change their gallery status.
-        // Admins are also allowed by this check, which is fine for now.
         if (!securityUtil.isSelfOrAdmin(email)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
