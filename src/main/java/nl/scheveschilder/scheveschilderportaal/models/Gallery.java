@@ -12,6 +12,12 @@ public class Gallery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // --- NEW FIELD ---
+    // This will track if the gallery is visible to the public.
+    // It defaults to 'false' for all new galleries.
+    @Column(name = "is_public", nullable = false, columnDefinition = "boolean default false")
+    private boolean isPublic = false;
+
     @OneToOne
     @JoinColumn(name = "student_id", unique = true)
     private Student student;
@@ -19,12 +25,23 @@ public class Gallery {
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Artwork> artworks = new ArrayList<>();
 
+    // --- Getters and Setters ---
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    // --- New Getter and Setter for isPublic ---
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 
     public Student getStudent() {
