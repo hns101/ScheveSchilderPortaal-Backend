@@ -7,15 +7,16 @@ import java.util.stream.Collectors;
 
 public class GalleryDto {
     public Long id;
-    public Long studentId;
+    // public Long studentId; // We are replacing this...
+    public PublicStudentDto student; // ...with this safe DTO.
     public List<ArtworkDto> artworks;
-    public boolean isPublic; // --- NEW FIELD ---
+    public boolean isPublic;
 
     public static GalleryDto fromEntity(Gallery gallery) {
         GalleryDto dto = new GalleryDto();
         dto.id = gallery.getId();
-        dto.studentId = gallery.getStudent().getId();
-        dto.isPublic = gallery.isPublic(); // --- ADD THIS LINE ---
+        dto.student = PublicStudentDto.fromEntity(gallery.getStudent()); // Use the new DTO
+        dto.isPublic = gallery.isPublic();
         dto.artworks = gallery.getArtworks().stream()
                 .map(ArtworkDto::fromEntity)
                 .collect(Collectors.toList());
