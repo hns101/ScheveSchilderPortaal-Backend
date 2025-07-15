@@ -1,6 +1,7 @@
 package nl.scheveschilder.scheveschilderportaal.service;
 
 import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
+import nl.scheveschilder.scheveschilderportaal.exceptions.ResourceNotFoundException;
 import nl.scheveschilder.scheveschilderportaal.models.Artwork;
 import nl.scheveschilder.scheveschilderportaal.models.Gallery;
 import nl.scheveschilder.scheveschilderportaal.models.Student;
@@ -28,13 +29,11 @@ public class ArtworkService {
     }
 
     public List<ArtworkDto> getArtworksByStudentEmail(String email) {
-        Student student = studentRepo.findAll().stream()
-                .filter(s -> s.getUser() != null && s.getUser().getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Student with email " + email + " not found"));
+        Student student = studentRepo.findByUserEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Student with email " + email + " not found"));
 
         Gallery gallery = galleryRepo.findByStudent(student)
-                .orElseThrow(() -> new IllegalArgumentException("Gallery not found for student " + student.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student " + student.getId()));
 
         return artworkRepo.findByGallery(gallery)
                 .stream()
@@ -43,20 +42,15 @@ public class ArtworkService {
     }
 
     public ArtworkDto addArtworkToStudent(String email, ArtworkDto dto) {
-        // Find the student by email
-        Student student = studentRepo.findAll().stream()
-                .filter(s -> s.getUser() != null && s.getUser().getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Student met email '" + email + "' niet gevonden."));
+        Student student = studentRepo.findByUserEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Student met email '" + email + "' niet gevonden."));
 
-        // Get or create the student's gallery
         Gallery gallery = galleryRepo.findByStudent(student).orElseGet(() -> {
             Gallery newGallery = new Gallery();
             newGallery.setStudent(student);
             return galleryRepo.save(newGallery);
         });
 
-        // Map ArtworkDto to Artwork entity
         Artwork artwork = new Artwork();
         artwork.setTitle(dto.title);
         artwork.setYear(dto.year);
@@ -71,7 +65,7 @@ public class ArtworkService {
 
     public void removeArtwork(String email, Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
-                .orElseThrow(() -> new IllegalArgumentException("Artwork not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Artwork not found"));
 
         String photoFile = artwork.getPhotoUrl();
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -83,15 +77,33 @@ public class ArtworkService {
 
     public void assignPhotoToArtwork(Long artworkId, String photoFileName) {
         Artwork artwork = artworkRepo.findById(artworkId)
-                .orElseThrow(() -> new IllegalArgumentException("Artwork niet gevonden"));
+                .orElseThrow(() -> new ResourceNotFoundException("Artwork niet gevonden"));
         artwork.setPhotoUrl(photoFileName);
         artworkRepo.save(artwork);
     }
 
+    // This is the existing protected method
     public String getArtworkPhotoFileName(Long artworkId) {
         return artworkRepo.findById(artworkId)
                 .map(Artwork::getPhotoUrl)
-                .orElseThrow(() -> new IllegalArgumentException("Foto niet gevonden"));
+                .orElseThrow(() -> new ResourceNotFoundException("Foto niet gevonden"));
+    }
+
+    /**
+     * Finds an artwork's photo filename, but only if its parent gallery is public.
+     * @param artworkId The ID of the artwork.
+     * @return The photo filename if the artwork and its gallery are public.
+     * @throws ResourceNotFoundException if the artwork is not found or its gallery is private.
+     */
+    public String getPublicArtworkPhotoFileName(Long artworkId) {
+        Artwork artwork = artworkRepo.findById(artworkId)
+                .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
+
+        // Security check: Is the gallery public?
+        if (artwork.getGallery() == null || !artwork.getGallery().isPublic()) {
+            throw new ResourceNotFoundException("Artwork is not in a public gallery.");
+        }
+
+        return artwork.getPhotoUrl();
     }
 }
-
