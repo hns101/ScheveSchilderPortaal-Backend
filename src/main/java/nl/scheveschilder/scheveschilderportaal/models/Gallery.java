@@ -15,6 +15,11 @@ public class Gallery {
     @Column(name = "is_public", nullable = false, columnDefinition = "boolean default true")
     private boolean isPublic = true;
 
+    // Used to control the display order on the public hub page.
+    // Defaults to a high number so new galleries appear at the end.
+    @Column(name = "display_order")
+    private Integer displayOrder = 1000;
+
     @OneToOne
     @JoinColumn(name = "student_id", unique = true)
     private Student student;
@@ -22,9 +27,6 @@ public class Gallery {
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Artwork> artworks = new ArrayList<>();
 
-    // --- NEW FIELD ---
-    // This will store a reference to the artwork chosen as the gallery's cover photo.
-    // It's nullable because a gallery might not have a cover set.
     @OneToOne
     @JoinColumn(name = "cover_artwork_id")
     private Artwork coverArtwork;
@@ -48,6 +50,15 @@ public class Gallery {
         isPublic = aPublic;
     }
 
+    // --- New Getter and Setter for displayOrder ---
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
     public Student getStudent() {
         return student;
     }
@@ -64,7 +75,6 @@ public class Gallery {
         this.artworks = artworks;
     }
 
-    // --- New Getter and Setter for coverArtwork ---
     public Artwork getCoverArtwork() {
         return coverArtwork;
     }

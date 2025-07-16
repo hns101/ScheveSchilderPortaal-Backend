@@ -19,7 +19,7 @@ public class GalleryService {
 
     private final GalleryRepository galleryRepo;
     private final StudentRepository studentRepo;
-    private final ArtworkRepository artworkRepo; // Add ArtworkRepository dependency
+    private final ArtworkRepository artworkRepo;
 
     public GalleryService(GalleryRepository galleryRepo, StudentRepository studentRepo, ArtworkRepository artworkRepo) {
         this.galleryRepo = galleryRepo;
@@ -50,7 +50,8 @@ public class GalleryService {
     }
 
     public List<GalleryDto> getPublicGalleries() {
-        List<Gallery> publicGalleries = galleryRepo.findAllByIsPublic(true);
+        // Use the new repository method to get sorted galleries
+        List<Gallery> publicGalleries = galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc();
 
         return publicGalleries.stream()
                 .map(GalleryDto::fromEntity)
@@ -71,26 +72,35 @@ public class GalleryService {
         return GalleryDto.fromEntity(gallery);
     }
 
-    // --- NEW METHOD ---
     @Transactional
     public void setGalleryCoverPhoto(String email, Long artworkId) {
-        // Find the student and their gallery
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
 
-        // Find the selected artwork
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
 
-        // Security Check: Ensure the artwork belongs to the user's gallery
         if (!artwork.getGallery().getId().equals(gallery.getId())) {
             throw new IllegalArgumentException("Artwork does not belong to this gallery.");
         }
 
-        // Set the cover photo and save
         gallery.setCoverArtwork(artwork);
         galleryRepo.save(gallery);
+    }
+
+    // --- NEW METHOD for Admin ---
+    @Transactional
+    public void updateGalleryOrder(List<Long> galleryIds) {
+        for (int i = 0; i < galleryIds.size(); i++) {
+            Long galleryId = galleryIds.get(i);
+            int displayOrder = i; // The order is determined by the position in the list
+
+            galleryRepo.findById(galleryId).ifPresent(gallery -> {
+                gallery.setDisplayOrder(displayOrder);
+                galleryRepo.save(gallery);
+            });
+        }
     }
 }

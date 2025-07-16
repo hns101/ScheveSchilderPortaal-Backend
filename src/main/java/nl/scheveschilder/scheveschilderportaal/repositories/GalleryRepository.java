@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface GalleryRepository extends JpaRepository<Gallery, Long> {
     Optional<Gallery> findByStudent(Student student);
 
-    // This will find all galleries where the 'isPublic' field is true.
-    List<Gallery> findAllByIsPublic(boolean isPublic);
+    // This will find all public galleries and sort them by the displayOrder field, ascending.
+    List<Gallery> findAllByIsPublicTrueOrderByDisplayOrderAsc();
 }
