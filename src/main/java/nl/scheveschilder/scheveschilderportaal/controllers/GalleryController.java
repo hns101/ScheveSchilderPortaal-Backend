@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.GalleryOrderDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryStatusDto;
 import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkPhotoService;
@@ -94,7 +95,6 @@ public class GalleryController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- NEW ENDPOINT ---
     @PutMapping("/galleries/{email}/cover/{artworkId}")
     public ResponseEntity<Void> setGalleryCoverPhoto(@PathVariable String email, @PathVariable Long artworkId) {
         if (!securityUtil.isSelfOrAdmin(email)) {
@@ -155,5 +155,12 @@ public class GalleryController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    // --- NEW ADMIN ENDPOINT ---
+    @PutMapping("/admin/galleries/order")
+    public ResponseEntity<Void> updateGalleryOrder(@RequestBody GalleryOrderDto galleryOrderDto) {
+        galleryService.updateGalleryOrder(galleryOrderDto.getGalleryIds());
+        return ResponseEntity.noContent().build();
     }
 }
