@@ -54,10 +54,8 @@ public class GalleryController {
         return ResponseEntity.ok(gallery);
     }
 
-    // --- NEW PUBLIC PHOTO ENDPOINT ---
     @GetMapping("/public/artworks/{id}/photo")
     public ResponseEntity<Resource> getPublicArtworkPhoto(@PathVariable Long id, HttpServletRequest request) throws MalformedURLException {
-        // This service method contains the security check
         String photoFileName = artworkService.getPublicArtworkPhotoFileName(id);
         Resource resource = artworkPhotoService.getPhoto(photoFileName);
 
@@ -96,6 +94,16 @@ public class GalleryController {
         return ResponseEntity.noContent().build();
     }
 
+    // --- NEW ENDPOINT ---
+    @PutMapping("/galleries/{email}/cover/{artworkId}")
+    public ResponseEntity<Void> setGalleryCoverPhoto(@PathVariable String email, @PathVariable Long artworkId) {
+        if (!securityUtil.isSelfOrAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        galleryService.setGalleryCoverPhoto(email, artworkId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/galleries/{email}/artworks")
     public ResponseEntity<List<ArtworkDto>> getAllArtworks(@PathVariable String email) {
         if (!securityUtil.isSelfOrAdmin(email)) {
@@ -128,7 +136,6 @@ public class GalleryController {
         return ResponseEntity.ok().build();
     }
 
-    // This is the existing protected endpoint
     @GetMapping("/artworks/{id}/photo")
     public ResponseEntity<Resource> getArtworkPhoto(@PathVariable Long id, HttpServletRequest request) throws MalformedURLException {
         String photoFileName = artworkService.getArtworkPhotoFileName(id);
