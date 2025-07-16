@@ -12,6 +12,7 @@ public class GalleryDto {
     public PublicStudentDto student;
     public List<ArtworkDto> artworks;
     public boolean isPublic;
+    public Long coverArtworkId;
 
     public static GalleryDto fromEntity(Gallery gallery) {
         GalleryDto dto = new GalleryDto();
@@ -19,7 +20,11 @@ public class GalleryDto {
         dto.student = PublicStudentDto.fromEntity(gallery.getStudent());
         dto.isPublic = gallery.isPublic();
 
-        // -- Sort artworks by year descending ---
+        // --- Add the cover artwork ID, if it exists ---
+        if (gallery.getCoverArtwork() != null) {
+            dto.coverArtworkId = gallery.getCoverArtwork().getId();
+        }
+
         if (gallery.getArtworks() != null) {
             dto.artworks = gallery.getArtworks().stream()
                     .sorted(Comparator.comparing(Artwork::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
