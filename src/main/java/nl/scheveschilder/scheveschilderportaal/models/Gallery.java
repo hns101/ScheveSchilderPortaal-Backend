@@ -12,7 +12,6 @@ public class Gallery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- UPDATED: Default value is now 'true' ---
     @Column(name = "is_public", nullable = false, columnDefinition = "boolean default true")
     private boolean isPublic = true;
 
@@ -22,6 +21,14 @@ public class Gallery {
 
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Artwork> artworks = new ArrayList<>();
+
+    // --- NEW FIELD ---
+    // This will store a reference to the artwork chosen as the gallery's cover photo.
+    // It's nullable because a gallery might not have a cover set.
+    @OneToOne
+    @JoinColumn(name = "cover_artwork_id")
+    private Artwork coverArtwork;
+
 
     // --- Getters and Setters ---
 
@@ -55,5 +62,14 @@ public class Gallery {
 
     public void setArtworks(List<Artwork> artworks) {
         this.artworks = artworks;
+    }
+
+    // --- New Getter and Setter for coverArtwork ---
+    public Artwork getCoverArtwork() {
+        return coverArtwork;
+    }
+
+    public void setCoverArtwork(Artwork coverArtwork) {
+        this.coverArtwork = coverArtwork;
     }
 }
