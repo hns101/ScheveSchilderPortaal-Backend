@@ -1,5 +1,6 @@
 package nl.scheveschilder.scheveschilderportaal.service;
 
+import nl.scheveschilder.scheveschilderportaal.dtos.CollectionDetailDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.CollectionDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.CollectionInputDto;
 import nl.scheveschilder.scheveschilderportaal.exceptions.ResourceNotFoundException;
@@ -22,6 +23,13 @@ public class CollectionService {
     public CollectionService(CollectionRepository collectionRepo, ArtworkRepository artworkRepo) {
         this.collectionRepo = collectionRepo;
         this.artworkRepo = artworkRepo;
+    }
+
+    // --- NEW METHOD ---
+    public CollectionDetailDto getCollectionById(Long id) {
+        Collection collection = collectionRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with ID: " + id));
+        return CollectionDetailDto.fromEntity(collection);
     }
 
     public List<CollectionDto> getAllCollections() {
@@ -84,7 +92,6 @@ public class CollectionService {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
 
-        // Optional security check: ensure the artwork is actually in the collection before setting as cover
         if (!collection.getArtworks().contains(artwork)) {
             throw new IllegalArgumentException("Artwork must be in the collection to be set as cover.");
         }
