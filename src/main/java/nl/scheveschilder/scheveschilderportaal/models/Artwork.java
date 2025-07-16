@@ -1,6 +1,9 @@
 package nl.scheveschilder.scheveschilderportaal.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Artwork {
@@ -20,6 +23,15 @@ public class Artwork {
     @ManyToOne
     @JoinColumn(name = "student_id")
     private Student artist;
+
+    // --- NEW FIELD ---
+    // This completes the many-to-many relationship.
+    // 'mappedBy = "artworks"' indicates that the Collection entity manages the relationship table.
+    @ManyToMany(mappedBy = "artworks", fetch = FetchType.LAZY)
+    @JsonIgnore // Prevents infinite loops when serializing to JSON
+    private Set<Collection> collections = new HashSet<>();
+
+    // --- Getters and Setters ---
 
     public Long getId() {
         return id;
@@ -67,5 +79,14 @@ public class Artwork {
 
     public void setArtist(Student artist) {
         this.artist = artist;
+    }
+
+    // --- New Getter and Setter for collections ---
+    public Set<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(Set<Collection> collections) {
+        this.collections = collections;
     }
 }
