@@ -21,7 +21,7 @@ public class ArtworkService {
     private final GalleryRepository galleryRepo;
     private final ArtworkPhotoService artworkPhotoService;
 
-    public ArtworkService(ArtworkRepository artworkRepo, StudentRepository studentRepo, GalleryRepository galleryRepo, ArtworkPhotoService artworkPhotoService  ) {
+    public ArtworkService(ArtworkRepository artworkRepo, StudentRepository studentRepo, GalleryRepository galleryRepo, ArtworkPhotoService artworkPhotoService) {
         this.artworkRepo = artworkRepo;
         this.studentRepo = studentRepo;
         this.galleryRepo = galleryRepo;
@@ -31,67 +31,61 @@ public class ArtworkService {
     public List<ArtworkDto> getArtworksByStudentEmail(String email) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student with email " + email + " not found"));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student " + student.getId()));
-
-        return artworkRepo.findByGallery(gallery)
-                .stream()
-                .map(ArtworkDto::fromEntity)
-                .toList();
+        return artworkRepo.findByGallery(gallery).stream().map(ArtworkDto::fromEntity).toList();
     }
 
     public ArtworkDto addArtworkToStudent(String email, ArtworkDto dto) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student met email '" + email + "' niet gevonden."));
+        return createAndSaveArtwork(student, dto);
+    }
 
+    // --- NEW: Admin method to add artwork by student ID ---
+    public ArtworkDto adminAddArtworkToStudent(Long studentId, ArtworkDto dto) {
+        Student student = studentRepo.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student met ID '" + studentId + "' niet gevonden."));
+        return createAndSaveArtwork(student, dto);
+    }
+
+    // Helper method to avoid code duplication
+    private ArtworkDto createAndSaveArtwork(Student student, ArtworkDto dto) {
         Gallery gallery = galleryRepo.findByStudent(student).orElseGet(() -> {
             Gallery newGallery = new Gallery();
             newGallery.setStudent(student);
             return galleryRepo.save(newGallery);
         });
-
         Artwork artwork = new Artwork();
         artwork.setTitle(dto.title);
         artwork.setYear(dto.year);
         artwork.setPhotoUrl(dto.photoUrl);
         artwork.setArtist(student);
         artwork.setGallery(gallery);
-
         Artwork saved = artworkRepo.save(artwork);
-
         return ArtworkDto.fromEntity(saved);
     }
 
     public void removeArtwork(String email, Long artworkId) {
-        // This method is for users deleting their own artwork
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found"));
-
-        // Security check could be added here to ensure the artwork belongs to the user 'email'
-
         String photoFile = artwork.getPhotoUrl();
         if (photoFile != null && !photoFile.isEmpty()) {
             artworkPhotoService.deletePhoto(photoFile);
         }
-
         artworkRepo.delete(artwork);
     }
 
-    // --- NEW ADMIN DELETE METHOD ---
     @Transactional
     public void adminDeleteArtwork(Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
-
         String photoFile = artwork.getPhotoUrl();
         if (photoFile != null && !photoFile.isEmpty()) {
             artworkPhotoService.deletePhoto(photoFile);
         }
-
         artworkRepo.delete(artwork);
     }
-
 
     public void assignPhotoToArtwork(Long artworkId, String photoFileName) {
         Artwork artwork = artworkRepo.findById(artworkId)
@@ -101,19 +95,16 @@ public class ArtworkService {
     }
 
     public String getArtworkPhotoFileName(Long artworkId) {
-        return artworkRepo.findById(artworkId)
-                .map(Artwork::getPhotoUrl)
+        return artworkRepo.findById(artworkId).map(Artwork::getPhotoUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Foto niet gevonden"));
     }
 
     public String getPublicArtworkPhotoFileName(Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
-
         if (artwork.getGallery() == null || !artwork.getGallery().isPublic()) {
             throw new ResourceNotFoundException("Artwork is not in a public gallery.");
         }
-
         return artwork.getPhotoUrl();
     }
 }

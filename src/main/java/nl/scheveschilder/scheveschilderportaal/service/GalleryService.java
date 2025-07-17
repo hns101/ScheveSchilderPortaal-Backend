@@ -30,10 +30,8 @@ public class GalleryService {
     public GalleryDto getGalleryByStudentEmail(String email) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -41,19 +39,14 @@ public class GalleryService {
     public void updateGalleryStatus(String email, boolean isPublic) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         gallery.setPublic(isPublic);
         galleryRepo.save(gallery);
     }
 
     public List<GalleryDto> getPublicGalleries() {
-        // Use the new repository method to get sorted galleries
-        List<Gallery> publicGalleries = galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc();
-
-        return publicGalleries.stream()
+        return galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc().stream()
                 .map(GalleryDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -61,14 +54,11 @@ public class GalleryService {
     public GalleryDto getPublicGalleryByStudentId(Long studentId) {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         if (!gallery.isPublic()) {
             throw new ResourceNotFoundException("Gallery is not public.");
         }
-
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -76,31 +66,27 @@ public class GalleryService {
     public void setGalleryCoverPhoto(String email, Long artworkId) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
+        setCoverPhotoByStudent(student, artworkId);
+    }
+
+    // --- NEW: Admin method to set cover photo by student ID ---
+    @Transactional
+    public void adminSetGalleryCoverPhoto(Long studentId, Long artworkId) {
+        Student student = studentRepo.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
+        setCoverPhotoByStudent(student, artworkId);
+    }
+
+    // Helper method to avoid code duplication
+    private void setCoverPhotoByStudent(Student student, Long artworkId) {
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
-
         if (!artwork.getGallery().getId().equals(gallery.getId())) {
             throw new IllegalArgumentException("Artwork does not belong to this gallery.");
         }
-
         gallery.setCoverArtwork(artwork);
         galleryRepo.save(gallery);
-    }
-
-    // --- NEW METHOD for Admin ---
-    @Transactional
-    public void updateGalleryOrder(List<Long> galleryIds) {
-        for (int i = 0; i < galleryIds.size(); i++) {
-            Long galleryId = galleryIds.get(i);
-            int displayOrder = i; // The order is determined by the position in the list
-
-            galleryRepo.findById(galleryId).ifPresent(gallery -> {
-                gallery.setDisplayOrder(displayOrder);
-                galleryRepo.save(gallery);
-            });
-        }
     }
 }
