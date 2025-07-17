@@ -2,11 +2,7 @@ package nl.scheveschilder.scheveschilderportaal.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.CollectionDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.GalleryDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.GalleryOrderDto;
-import nl.scheveschilder.scheveschilderportaal.dtos.GalleryStatusDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.*;
 import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkPhotoService;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkService;
@@ -31,14 +27,14 @@ public class GalleryController {
     private final ArtworkService artworkService;
     private final ArtworkPhotoService artworkPhotoService;
     private final SecurityUtil securityUtil;
-    private final CollectionService collectionService; // Add CollectionService dependency
+    private final CollectionService collectionService;
 
     public GalleryController(
             GalleryService galleryService,
             ArtworkService artworkService,
             ArtworkPhotoService artworkPhotoService,
             SecurityUtil securityUtil,
-            CollectionService collectionService // Add to constructor
+            CollectionService collectionService
     ) {
         this.galleryService = galleryService;
         this.artworkService = artworkService;
@@ -50,21 +46,22 @@ public class GalleryController {
     // --- PUBLIC ENDPOINTS ---
     @GetMapping("/public/galleries")
     public ResponseEntity<List<GalleryDto>> getPublicGalleries() {
-        List<GalleryDto> publicGalleries = galleryService.getPublicGalleries();
-        return ResponseEntity.ok(publicGalleries);
+        return ResponseEntity.ok(galleryService.getPublicGalleries());
     }
 
-    // --- NEW PUBLIC ENDPOINT for Collections ---
     @GetMapping("/public/collections")
     public ResponseEntity<List<CollectionDto>> getPublicCollections() {
-        List<CollectionDto> collections = collectionService.getAllCollections();
-        return ResponseEntity.ok(collections);
+        return ResponseEntity.ok(collectionService.getAllCollections());
     }
 
     @GetMapping("/public/gallery/{studentId}")
     public ResponseEntity<GalleryDto> getPublicGalleryById(@PathVariable Long studentId) {
-        GalleryDto gallery = galleryService.getPublicGalleryByStudentId(studentId);
-        return ResponseEntity.ok(gallery);
+        return ResponseEntity.ok(galleryService.getPublicGalleryByStudentId(studentId));
+    }
+
+    @GetMapping("/public/collection/{id}")
+    public ResponseEntity<CollectionDetailDto> getPublicCollectionById(@PathVariable Long id) {
+        return ResponseEntity.ok(collectionService.getCollectionById(id));
     }
 
     @GetMapping("/public/artworks/{id}/photo")

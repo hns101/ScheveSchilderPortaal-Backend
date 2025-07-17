@@ -25,7 +25,6 @@ public class CollectionService {
         this.artworkRepo = artworkRepo;
     }
 
-    // --- NEW METHOD ---
     public CollectionDetailDto getCollectionById(Long id) {
         Collection collection = collectionRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with ID: " + id));
