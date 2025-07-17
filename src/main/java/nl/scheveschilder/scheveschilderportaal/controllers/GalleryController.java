@@ -3,12 +3,14 @@ package nl.scheveschilder.scheveschilderportaal.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import nl.scheveschilder.scheveschilderportaal.dtos.ArtworkDto;
+import nl.scheveschilder.scheveschilderportaal.dtos.CollectionDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryOrderDto;
 import nl.scheveschilder.scheveschilderportaal.dtos.GalleryStatusDto;
 import nl.scheveschilder.scheveschilderportaal.security.SecurityUtil;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkPhotoService;
 import nl.scheveschilder.scheveschilderportaal.service.ArtworkService;
+import nl.scheveschilder.scheveschilderportaal.service.CollectionService;
 import nl.scheveschilder.scheveschilderportaal.service.GalleryService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -29,17 +31,20 @@ public class GalleryController {
     private final ArtworkService artworkService;
     private final ArtworkPhotoService artworkPhotoService;
     private final SecurityUtil securityUtil;
+    private final CollectionService collectionService; // Add CollectionService dependency
 
     public GalleryController(
             GalleryService galleryService,
             ArtworkService artworkService,
             ArtworkPhotoService artworkPhotoService,
-            SecurityUtil securityUtil
+            SecurityUtil securityUtil,
+            CollectionService collectionService // Add to constructor
     ) {
         this.galleryService = galleryService;
         this.artworkService = artworkService;
         this.artworkPhotoService = artworkPhotoService;
         this.securityUtil = securityUtil;
+        this.collectionService = collectionService;
     }
 
     // --- PUBLIC ENDPOINTS ---
@@ -47,6 +52,13 @@ public class GalleryController {
     public ResponseEntity<List<GalleryDto>> getPublicGalleries() {
         List<GalleryDto> publicGalleries = galleryService.getPublicGalleries();
         return ResponseEntity.ok(publicGalleries);
+    }
+
+    // --- NEW PUBLIC ENDPOINT for Collections ---
+    @GetMapping("/public/collections")
+    public ResponseEntity<List<CollectionDto>> getPublicCollections() {
+        List<CollectionDto> collections = collectionService.getAllCollections();
+        return ResponseEntity.ok(collections);
     }
 
     @GetMapping("/public/gallery/{studentId}")
@@ -157,7 +169,6 @@ public class GalleryController {
                 .body(resource);
     }
 
-    // --- NEW ADMIN ENDPOINT ---
     @PutMapping("/admin/galleries/order")
     public ResponseEntity<Void> updateGalleryOrder(@RequestBody GalleryOrderDto galleryOrderDto) {
         galleryService.updateGalleryOrder(galleryOrderDto.getGalleryIds());

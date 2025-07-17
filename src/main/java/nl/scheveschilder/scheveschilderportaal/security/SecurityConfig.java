@@ -52,21 +52,17 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Group all public endpoints together at the top
+                        // Public endpoints
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/public/galleries").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/public/gallery/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/public/artworks/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/public/**").permitAll() // Catch-all for public endpoints
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Role-based security for other endpoints
-                        .requestMatchers(HttpMethod.PUT, "/admin/galleries/order").hasRole("ADMIN")
-                        .requestMatchers("/admin/collections/**").hasRole("ADMIN")
+                        // User/Admin endpoints
                         .requestMatchers(HttpMethod.POST, "/weeks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks/{id}").hasAnyRole("USER", "ADMIN")
@@ -91,7 +87,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/artworks/{id}/photo").hasAnyRole("USER", "ADMIN")
 
-                        // ✅ This must be LAST to secure all other endpoints
                         .anyRequest().denyAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

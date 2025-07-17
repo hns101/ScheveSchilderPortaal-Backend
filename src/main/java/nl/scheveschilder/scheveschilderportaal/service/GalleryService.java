@@ -30,8 +30,10 @@ public class GalleryService {
     public GalleryDto getGalleryByStudentEmail(String email) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
+
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -39,14 +41,18 @@ public class GalleryService {
     public void updateGalleryStatus(String email, boolean isPublic) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
+
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
         gallery.setPublic(isPublic);
         galleryRepo.save(gallery);
     }
 
     public List<GalleryDto> getPublicGalleries() {
-        return galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc().stream()
+        List<Gallery> publicGalleries = galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc();
+
+        return publicGalleries.stream()
                 .map(GalleryDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -54,11 +60,14 @@ public class GalleryService {
     public GalleryDto getPublicGalleryByStudentId(Long studentId) {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
+
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
         if (!gallery.isPublic()) {
             throw new ResourceNotFoundException("Gallery is not public.");
         }
+
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -69,7 +78,6 @@ public class GalleryService {
         setCoverPhotoByStudent(student, artworkId);
     }
 
-    // --- NEW: Admin method to set cover photo by student ID ---
     @Transactional
     public void adminSetGalleryCoverPhoto(Long studentId, Long artworkId) {
         Student student = studentRepo.findById(studentId)
@@ -77,7 +85,6 @@ public class GalleryService {
         setCoverPhotoByStudent(student, artworkId);
     }
 
-    // Helper method to avoid code duplication
     private void setCoverPhotoByStudent(Student student, Long artworkId) {
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
@@ -88,5 +95,19 @@ public class GalleryService {
         }
         gallery.setCoverArtwork(artwork);
         galleryRepo.save(gallery);
+    }
+
+    // --- THIS METHOD WAS MISSING ---
+    @Transactional
+    public void updateGalleryOrder(List<Long> galleryIds) {
+        for (int i = 0; i < galleryIds.size(); i++) {
+            Long galleryId = galleryIds.get(i);
+            int displayOrder = i;
+
+            galleryRepo.findById(galleryId).ifPresent(gallery -> {
+                gallery.setDisplayOrder(displayOrder);
+                galleryRepo.save(gallery);
+            });
+        }
     }
 }
