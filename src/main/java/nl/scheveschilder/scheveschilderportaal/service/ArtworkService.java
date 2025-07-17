@@ -8,8 +8,8 @@ import nl.scheveschilder.scheveschilderportaal.models.Student;
 import nl.scheveschilder.scheveschilderportaal.repositories.ArtworkRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.StudentRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.GalleryRepository;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,8 +64,11 @@ public class ArtworkService {
     }
 
     public void removeArtwork(String email, Long artworkId) {
+        // This method is for users deleting their own artwork
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found"));
+
+        // Security check could be added here to ensure the artwork belongs to the user 'email'
 
         String photoFile = artwork.getPhotoUrl();
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -75,6 +78,21 @@ public class ArtworkService {
         artworkRepo.delete(artwork);
     }
 
+    // --- NEW ADMIN DELETE METHOD ---
+    @Transactional
+    public void adminDeleteArtwork(Long artworkId) {
+        Artwork artwork = artworkRepo.findById(artworkId)
+                .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
+
+        String photoFile = artwork.getPhotoUrl();
+        if (photoFile != null && !photoFile.isEmpty()) {
+            artworkPhotoService.deletePhoto(photoFile);
+        }
+
+        artworkRepo.delete(artwork);
+    }
+
+
     public void assignPhotoToArtwork(Long artworkId, String photoFileName) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork niet gevonden"));
@@ -82,24 +100,16 @@ public class ArtworkService {
         artworkRepo.save(artwork);
     }
 
-    // This is the existing protected method
     public String getArtworkPhotoFileName(Long artworkId) {
         return artworkRepo.findById(artworkId)
                 .map(Artwork::getPhotoUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Foto niet gevonden"));
     }
 
-    /**
-     * Finds an artwork's photo filename, but only if its parent gallery is public.
-     * @param artworkId The ID of the artwork.
-     * @return The photo filename if the artwork and its gallery are public.
-     * @throws ResourceNotFoundException if the artwork is not found or its gallery is private.
-     */
     public String getPublicArtworkPhotoFileName(Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
 
-        // Security check: Is the gallery public?
         if (artwork.getGallery() == null || !artwork.getGallery().isPublic()) {
             throw new ResourceNotFoundException("Artwork is not in a public gallery.");
         }
