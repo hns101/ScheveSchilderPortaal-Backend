@@ -61,6 +61,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/public/gallery/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/public/artworks/**").permitAll()
 
+                        // Admin endpoints
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
                         // Role-based security for other endpoints
                         .requestMatchers(HttpMethod.PUT, "/admin/galleries/order").hasRole("ADMIN")
                         .requestMatchers("/admin/collections/**").hasRole("ADMIN")
