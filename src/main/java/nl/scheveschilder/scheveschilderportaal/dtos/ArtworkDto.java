@@ -8,18 +8,19 @@ public class ArtworkDto {
     public String year;
     public String photoUrl;
     public Long galleryId;
-    public String artistName;
+    public PublicStudentDto artist; // Changed from String artistName to the safe DTO
 
     public static ArtworkDto fromEntity(Artwork artwork) {
         ArtworkDto dto = new ArtworkDto();
         dto.id = artwork.getId();
         dto.title = artwork.getTitle();
-        dto.year = artwork.getYear(); // already a string
+        dto.year = artwork.getYear();
         dto.photoUrl = artwork.getPhotoUrl();
         dto.galleryId = artwork.getGallery() != null ? artwork.getGallery().getId() : null;
-        dto.artistName = artwork.getArtist() != null
-                ? artwork.getArtist().getFirstname() + " " + artwork.getArtist().getLastname()
-                : null;
+
+        // Use the safe PublicStudentDto to include the artist's ID and formatted name
+        dto.artist = PublicStudentDto.fromEntity(artwork.getArtist());
+
         return dto;
     }
 
@@ -27,7 +28,7 @@ public class ArtworkDto {
         Artwork artwork = new Artwork();
         artwork.setId(this.id);
         artwork.setTitle(this.title);
-        artwork.setYear(this.year); // set string
+        artwork.setYear(this.year);
         artwork.setPhotoUrl(this.photoUrl);
         // gallery and artist should be set in the service
         return artwork;
