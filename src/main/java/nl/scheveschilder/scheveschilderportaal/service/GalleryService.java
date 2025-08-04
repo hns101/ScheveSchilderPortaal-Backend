@@ -27,13 +27,28 @@ public class GalleryService {
         this.artworkRepo = artworkRepo;
     }
 
+    // --- NEW: Admin method to get ALL galleries ---
+    public List<GalleryDto> adminGetAllGalleries() {
+        // Assumes a method exists in the repository to fetch all galleries sorted by display order
+        return galleryRepo.findAllByOrderByDisplayOrderAsc().stream()
+                .map(GalleryDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    // --- NEW: Admin method to update ANY gallery's status ---
+    @Transactional
+    public void adminUpdateGalleryStatus(Long galleryId, boolean isPublic) {
+        Gallery gallery = galleryRepo.findById(galleryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Gallery not found with ID: " + galleryId));
+        gallery.setPublic(isPublic);
+        galleryRepo.save(gallery);
+    }
+
     public GalleryDto getGalleryByStudentEmail(String email) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -41,17 +56,14 @@ public class GalleryService {
     public void updateGalleryStatus(String email, boolean isPublic) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         gallery.setPublic(isPublic);
         galleryRepo.save(gallery);
     }
 
     public List<GalleryDto> getPublicGalleries() {
         List<Gallery> publicGalleries = galleryRepo.findAllByIsPublicTrueOrderByDisplayOrderAsc();
-
         return publicGalleries.stream()
                 .map(GalleryDto::fromEntity)
                 .collect(Collectors.toList());
@@ -60,14 +72,11 @@ public class GalleryService {
     public GalleryDto getPublicGalleryByStudentId(Long studentId) {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
-
         Gallery gallery = galleryRepo.findByStudent(student)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
-
         if (!gallery.isPublic()) {
             throw new ResourceNotFoundException("Gallery is not public.");
         }
-
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -97,13 +106,11 @@ public class GalleryService {
         galleryRepo.save(gallery);
     }
 
-    // --- THIS METHOD WAS MISSING ---
     @Transactional
     public void updateGalleryOrder(List<Long> galleryIds) {
         for (int i = 0; i < galleryIds.size(); i++) {
             Long galleryId = galleryIds.get(i);
             int displayOrder = i;
-
             galleryRepo.findById(galleryId).ifPresent(gallery -> {
                 gallery.setDisplayOrder(displayOrder);
                 galleryRepo.save(gallery);
