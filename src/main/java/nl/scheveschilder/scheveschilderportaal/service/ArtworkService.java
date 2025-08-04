@@ -6,12 +6,13 @@ import nl.scheveschilder.scheveschilderportaal.models.Artwork;
 import nl.scheveschilder.scheveschilderportaal.models.Gallery;
 import nl.scheveschilder.scheveschilderportaal.models.Student;
 import nl.scheveschilder.scheveschilderportaal.repositories.ArtworkRepository;
-import nl.scheveschilder.scheveschilderportaal.repositories.StudentRepository;
 import nl.scheveschilder.scheveschilderportaal.repositories.GalleryRepository;
+import nl.scheveschilder.scheveschilderportaal.repositories.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ArtworkService {
@@ -42,14 +43,12 @@ public class ArtworkService {
         return createAndSaveArtwork(student, dto);
     }
 
-    // --- NEW: Admin method to add artwork by student ID ---
     public ArtworkDto adminAddArtworkToStudent(Long studentId, ArtworkDto dto) {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student met ID '" + studentId + "' niet gevonden."));
         return createAndSaveArtwork(student, dto);
     }
 
-    // Helper method to avoid code duplication
     private ArtworkDto createAndSaveArtwork(Student student, ArtworkDto dto) {
         Gallery gallery = galleryRepo.findByStudent(student).orElseGet(() -> {
             Gallery newGallery = new Gallery();
@@ -66,20 +65,33 @@ public class ArtworkService {
         return ArtworkDto.fromEntity(saved);
     }
 
+    @Transactional
     public void removeArtwork(String email, Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found"));
-        String photoFile = artwork.getPhotoUrl();
-        if (photoFile != null && !photoFile.isEmpty()) {
-            artworkPhotoService.deletePhoto(photoFile);
+
+        if (!artwork.getArtist().getUser().getEmail().equals(email)) {
+            throw new SecurityException("User is not authorized to delete this artwork.");
         }
-        artworkRepo.delete(artwork);
+
+        deleteArtworkSafely(artwork);
     }
 
     @Transactional
     public void adminDeleteArtwork(Long artworkId) {
         Artwork artwork = artworkRepo.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork not found with ID: " + artworkId));
+
+        deleteArtworkSafely(artwork);
+    }
+
+    private void deleteArtworkSafely(Artwork artwork) {
+        Gallery gallery = artwork.getGallery();
+        if (gallery != null && gallery.getCoverArtwork() != null && Objects.equals(gallery.getCoverArtwork().getId(), artwork.getId())) {
+            gallery.setCoverArtwork(null);
+            galleryRepo.save(gallery);
+        }
+
         String photoFile = artwork.getPhotoUrl();
         if (photoFile != null && !photoFile.isEmpty()) {
             artworkPhotoService.deletePhoto(photoFile);
