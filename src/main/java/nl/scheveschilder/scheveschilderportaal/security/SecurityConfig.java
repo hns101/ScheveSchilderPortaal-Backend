@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/public/**").permitAll() // Catch-all for public endpoints
+                        .requestMatchers(HttpMethod.GET, "/public/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -66,16 +66,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/weeks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks/{id}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/weeks/{id}").hasAnyRole( "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/weeks/{id}").hasRole( "ADMIN") // Changed to hasRole
+
+                        // --- UPDATED RULES: These are now ADMIN-ONLY actions ---
+                        .requestMatchers(HttpMethod.POST, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/register").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/{email}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/{email}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/{email}/password").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/{email}/status").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/users/{email}").hasAnyRole( "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/users/{email}").hasRole( "ADMIN") // Changed to hasRole
                         .requestMatchers(HttpMethod.GET, "/students").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/galleries/{email}").hasAnyRole("USER", "ADMIN")
