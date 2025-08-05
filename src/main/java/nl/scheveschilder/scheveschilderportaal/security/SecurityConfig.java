@@ -52,6 +52,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // --- IMPORTANT FIX: Allow all OPTIONS preflight requests ---
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
+
                         // Public endpoints
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
@@ -67,11 +70,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/weeks").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/weeks/{id}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/weeks/{id}").hasRole("ADMIN")
-
-                        // --- RESTORED RULES: Allow both USER and ADMIN ---
                         .requestMatchers(HttpMethod.POST, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/weeks/{weekId}/lessons/{lessonId}/students/{email}").hasAnyRole("USER", "ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/register").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/{email}").hasAnyRole("USER", "ADMIN")
