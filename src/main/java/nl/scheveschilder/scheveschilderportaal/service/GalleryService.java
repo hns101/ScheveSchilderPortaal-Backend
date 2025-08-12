@@ -27,15 +27,12 @@ public class GalleryService {
         this.artworkRepo = artworkRepo;
     }
 
-    // --- NEW: Admin method to get ALL galleries ---
     public List<GalleryDto> adminGetAllGalleries() {
-        // Assumes a method exists in the repository to fetch all galleries sorted by display order
         return galleryRepo.findAllByOrderByDisplayOrderAsc().stream()
                 .map(GalleryDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    // --- NEW: Admin method to update ANY gallery's status ---
     @Transactional
     public void adminUpdateGalleryStatus(Long galleryId, boolean isPublic) {
         Gallery gallery = galleryRepo.findById(galleryId)
@@ -44,11 +41,19 @@ public class GalleryService {
         galleryRepo.save(gallery);
     }
 
+    // --- UPDATED METHOD ---
     public GalleryDto getGalleryByStudentEmail(String email) {
         Student student = studentRepo.findByUserEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found for email: " + email));
-        Gallery gallery = galleryRepo.findByStudent(student)
-                .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
+        // Use orElseGet to create a new gallery if one doesn't exist for the student
+        Gallery gallery = galleryRepo.findByStudent(student).orElseGet(() -> {
+            Gallery newGallery = new Gallery();
+            newGallery.setStudent(student);
+            // The default value for isPublic is handled by the entity itself
+            return galleryRepo.save(newGallery);
+        });
+
         return GalleryDto.fromEntity(gallery);
     }
 
@@ -69,11 +74,18 @@ public class GalleryService {
                 .collect(Collectors.toList());
     }
 
+    // --- UPDATED METHOD ---
     public GalleryDto getPublicGalleryByStudentId(Long studentId) {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
-        Gallery gallery = galleryRepo.findByStudent(student)
-                .orElseThrow(() -> new ResourceNotFoundException("Gallery not found for student: " + student.getId()));
+
+        // Also apply the "get or create" logic here for robustness
+        Gallery gallery = galleryRepo.findByStudent(student).orElseGet(() -> {
+            Gallery newGallery = new Gallery();
+            newGallery.setStudent(student);
+            return galleryRepo.save(newGallery);
+        });
+
         if (!gallery.isPublic()) {
             throw new ResourceNotFoundException("Gallery is not public.");
         }
